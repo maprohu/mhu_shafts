@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+import 'mhu_dart_model.proto';
+
+message MshSequencesMsg {
+  int32 long_running_task_id = 1;
+  uint64 shaft_seq = 2;
+}
+
+message MshWindowStateMsg {
+  MshShaftMsg top_shaft = 1;
+}
+
+
+message MshThemeMsg {
+  MshDividerThicknessThemeMsg divider_thickness = 1;
+  double min_shaft_width = 2;
+}
+
+message MshDividerThicknessThemeMsg {
+  double shafts = 1;
+  double shaft_header = 2;
+  double menu_items = 3;
+  double paginator_footer = 4;
+  double shaft_sharing = 5;
+}
+
+// shafts
+
+message MshNotificationMsg {
+  string text = 1;
+}
+
+message MshShaftMsg {
+  MshShaftMsg parent = 1;
+  uint64 shaft_seq = 2;
+  int32 width_units = 9;
+
+  MshShaftIdentifierMsg shaft_identifier = 20;
+  MshInnerStateMsg inner_state = 19;
+}
+
+message  MshShaftNotificationsMsg {
+  map<int32, MshShaftNotificationMsg> by_index_from_left = 1;
+}
+
+message MshShaftNotificationMsg {
+  repeated MshNotificationMsg notifications = 1;
+}
+
+message MshShaftIdentifierMsg {
+  int32 shaft_factory_key = 1;
+  CmnAny any_data = 2;
+//  oneof type {
+//    MshViewTaskMsg view_task = 5;
+//
+//    MshConcreteFieldMsg concrete_field = 100;
+//    MshOneofFieldMsg oneof_field = 101;
+//    MshMapEntryKeyMsg map_entry = 102;
+//  }
+}
+
+// identifier
+
+message  MshEmptyMsg {}
+
+message  MshConcreteFieldMsg {
+  int32 tag_number = 1;
+}
+
+message  MshOneofFieldMsg {
+  int32 oneof_index = 1;
+}
+
+message  MshMapEntryKeyMsg {
+  oneof type {
+    string string_key = 1;
+    int32 int_key = 2;
+  }
+}
+
+message MshViewTaskMsg {
+  int32 task_identifier = 1;
+}
+
+//message MshConfirmMsg {
+//  oneof type {
+//    MshGenericMsg generic = 1;
+//    MshEmptyMsg delete_entry = 2;
+//  }
+//}
+
+// inner state
+
+message  MshInnerStateMsg {
+  oneof type {
+    MshGenericMsg generic = 1;
+    MshStringEditStateMsg string_edit = 2;
+  }
+}
+
+message  MshEditIntMsg {
+  string text = 1;
+}
+
+message  MshEditStringMsg {
+  string text = 1;
+}
+
+message  MshMapEntryMsg {
+  MshMapEntryKeyMsg map_entry_key = 1;
+  MshScalarValueMsg map_entry_value = 2;
+}
+
+message  MshScalarValueMsg {
+  oneof type {
+    int32 int_value = 3;
+    string string_value = 4;
+    bool bool_value = 5;
+    bytes bytes_value = 6;
+  }
+}
+
+message  MshGenericMsg {
+  oneof type {
+    string string_value = 1;
+    int32 int32_value = 2;
+  }
+}
+
+message MshStringEditStateMsg {
+  string text = 1;
+  int32  cursor_position = 2;
+  bool pasting = 3;
+  bool focused = 4;
+}
+
+// dart

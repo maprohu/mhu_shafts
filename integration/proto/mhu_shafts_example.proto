@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+
+message SmpSampleMsg {
+  string sample_string = 1;
+}

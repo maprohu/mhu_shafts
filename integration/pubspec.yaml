@@ -1,0 +1,48 @@
+name: mhu_shafts_example
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependency_overrides:
+  mhu_dart_commons:
+    path: ../../mhu_dart_commons
+  mhu_dart_proto:
+    path: ../../mhu_dart_proto
+  mhu_dart_builder:
+    path: ../../mhu_dart_builder
+  mhu_dart_sourcegen:
+    path: ../../mhu_dart_sourcegen
+  mhu_dart_pbgen:
+    path: ../../mhu_dart_pbgen
+  mhu_dart_model:
+    path: ../../mhu_dart_model
+  mhu_dart_annotation:
+    path: ../../mhu_dart_annotation
+  mhu_flutter_commons:
+    path: ../../mhu_flutter_commons
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  mhu_dart_commons: ^1.0.8
+  mhu_dart_model: ^1.0.2
+  mhu_shafts:
+    path: ..
+
+
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.6
+
+  mhu_dart_pbgen: ^1.0.0
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
