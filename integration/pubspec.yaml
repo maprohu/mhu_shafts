@@ -28,6 +28,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  mhu_dart_annotation: ^1.0.1
   mhu_dart_commons: ^1.0.8
   mhu_dart_model: ^1.0.2
   mhu_shafts:
@@ -43,6 +44,7 @@ dev_dependencies:
 
   mhu_dart_pbgen: ^1.0.0
   flutter_lints: ^2.0.0
+  mhu_dart_builder: ^1.0.3
 
 flutter:
   uses-material-design: true

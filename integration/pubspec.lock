@@ -473,14 +473,14 @@ packages:
     source: hosted
     version: "1.9.1"
   mhu_dart_annotation:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../../mhu_dart_annotation"
       relative: true
     source: path
     version: "1.0.1"
   mhu_dart_builder:
-    dependency: "direct overridden"
+    dependency: "direct dev"
     description:
       path: "../../mhu_dart_builder"
       relative: true
