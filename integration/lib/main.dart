@@ -1,5 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:mhu_dart_commons/commons.dart';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
@@ -9,9 +7,11 @@ import 'package:mhu_shafts/proto.dart';
 
 import 'main.dart' as $lib;
 import 'proto.dart';
+
 part 'main.g.has.dart';
 part 'main.g.dart';
 
+part 'main.freezed.dart';
 
 part 'main_menu.dart';
 

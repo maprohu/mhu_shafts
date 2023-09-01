@@ -3,16 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
-import 'package:mhu_shafts/src/bx/boxed.dart';
+import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/src/bx/text.dart';
-import 'package:mhu_shafts/src/context/app.dart';
-import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 
 import '../../proto.dart';
-import '../bx/padding.dart';
-import '../bx/shortcut.dart';
-import '../bx/string.dart';
 import '../wx/wx.dart';
 import 'text.dart';
 import 'theme.dart' as $lib;
@@ -20,6 +15,7 @@ import 'theme.dart' as $lib;
 part 'theme.g.dart';
 
 part 'theme.g.has.dart';
+
 
 @Has()
 typedef ThemeMsg = MshThemeMsg;
@@ -32,9 +28,12 @@ final mdiDefaultTheme = MshThemeMsg$.create(
   ),
 )..freeze();
 
-@Compose()
 @Has()
-abstract base class ThemeWrap implements HasAppCtx, HasThemeMsg {
+class ThemeWrap with MixAppCtx, MixThemeMsg {
+  late final defaultPaddingThickness = 2.0;
+
+  late final defaultPadding = EdgeInsets.all(defaultPaddingThickness);
+
   static const _sizerKeys = 'MMM';
 
   late final assetObj = appCtx.assetObj;
@@ -98,7 +97,7 @@ abstract base class ThemeWrap implements HasAppCtx, HasThemeMsg {
   late final shaftHeaderContentHeight =
       max(shaftHeaderTextHeight, aimWxSize.height);
 
-  late final shaftHeaderPadding = const EdgeInsets.all(2);
+  late final shaftHeaderPadding = defaultPadding;
 
   late final shaftHeaderOuterHeight =
       shaftHeaderContentHeight + shaftHeaderPadding.vertical;
@@ -109,7 +108,7 @@ abstract base class ThemeWrap implements HasAppCtx, HasThemeMsg {
 
   late final menuItemHeight = menuItemPadding.vertical + menuItemInnerHeight;
 
-  late final menuItemPadding = const EdgeInsets.all(2);
+  late final menuItemPadding = defaultPadding;
 
   late final stringTextStyle = MonoTextStyle.from(robotoMonoTextStyle);
 
@@ -138,16 +137,36 @@ abstract base class ThemeWrap implements HasAppCtx, HasThemeMsg {
   late final longRunningTaskCompleteIconData = Icons.notification_important;
 
   late final textSplitMarker = this.themeTextSplitMarkBuilder();
+
+  late final protoFieldLabelTextStyleWrap = menuItemTextStyle.textStyleWrap();
+  late final protoFieldValueTextStyleWrap = robotoSlabTextStyle
+      .copyWith(
+        fontSize:
+            protoFieldLabelTextStyleWrap.textStyle.fontSize?.let((e) => e - 1),
+      )
+      .textStyleWrap();
+  late final protoFieldLabelValueGapHeight = 1.0;
+
+  late final protoFieldItemInnerHeight =
+      this.calculateProtoMessageFieldItemInnerHeight();
+
+  late final protoFieldItemInnerSize = Size(0, protoFieldItemInnerHeight);
+
+  late final protoFieldItemPadding = defaultPadding;
+
+  late final protoFieldItemOuterSize =
+      protoFieldItemPadding.inflateSize(protoFieldItemInnerSize);
+
+  late final protoFieldItemOuterHeight = protoFieldItemOuterSize.height;
 }
 
 ThemeWrap createThemeWrap({
   @Ext() required AppCtx appCtx,
   required ThemeMsg themeMsg,
 }) {
-  final themeObj = ComposedThemeWrap(
-    appCtx: appCtx,
-    themeMsg: themeMsg,
-  );
+  final themeObj = ThemeWrap()
+    ..appCtx = appCtx
+    ..themeMsg = themeMsg;
   return themeObj;
 }
 

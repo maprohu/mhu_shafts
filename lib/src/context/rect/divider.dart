@@ -9,7 +9,7 @@ Wx wxRectDivider({
     rectSize: rectCtx.size,
     layoutAxis: layoutAxis,
     thickness: thickness,
-    themeWrap: rectCtx.themeWrapRender(),
+    themeWrap: rectCtx.renderCtxThemeWrap(),
   );
 }
 

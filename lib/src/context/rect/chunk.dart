@@ -1,12 +1,29 @@
 part of '../rect.dart';
 
+SharingBox chunkedListRectVerticalSharingBox({
+  @ext required RectCtx rectCtx,
+  required List<WxRectBuilder> items,
+  required double itemHeight,
+}) {
+  final themeWrap = rectCtx.renderCtxThemeWrap();
+  return rectCtx.chunkedRectVerticalSharingBox(
+    itemHeight: itemHeight,
+    itemCount: items.length,
+    startAt: 0,
+    itemBuilder: (index, rectCtx) {
+      return items[index].call(rectCtx);
+    },
+    dividerThickness: themeWrap.menuItemsDividerThickness,
+  );
+}
+
 SharingBox chunkedRectVerticalSharingBox({
   @ext required RectCtx rectCtx,
   required double itemHeight,
   required int itemCount,
   required int startAt,
   required Wx Function(int index, RectCtx rectCtx) itemBuilder,
-  required double dividerThickness,
+  required double? dividerThickness,
   SharingBox? emptyBx,
 }) {
   if (itemCount == 0) {
@@ -20,8 +37,9 @@ SharingBox chunkedRectVerticalSharingBox({
               .wxEmpty(),
         );
   }
+
   final intrinsicHeight =
-      itemCount * itemHeight + (itemCount - 1) * dividerThickness;
+      itemCount * itemHeight + (itemCount - 1) * (dividerThickness ?? 0);
   return ComposedSharingBox(
     intrinsicDimension: intrinsicHeight,
     wxDimensionBuilder: (dimension) {
@@ -45,9 +63,10 @@ Wx wxChunkedRectVertical({
   required int itemCount,
   required int startAt,
   required Wx Function(int index, RectCtx rectCtx) itemBuilder,
-  required double dividerThickness,
+  required double? dividerThickness,
   SharingBox? emptyBx,
 }) {
+  final double effectiveDividerThickness = dividerThickness ?? 0;
   final themeWrap = rectCtx.renderObj.themeWrap;
   Wx page({
     required RectCtx rectCtx,
@@ -59,17 +78,21 @@ Wx wxChunkedRectVertical({
 
     var itemBits = rectCtx.rectWithHeight(height: itemHeight);
 
-    final divider = rectCtx.wxRectVerticalLayoutDivider(
-      thickness: dividerThickness,
-    );
     Wx itemsWx(Size size) {
+      final divider = dividerThickness != null
+          ? rectCtx.wxRectVerticalLayoutDivider(
+              thickness: dividerThickness,
+            )
+          : null;
       return wxColumn(
         children: integers(from: startAt)
             .take(count)
             .map(
               (index) => itemBuilder(index, itemBits),
             )
-            .separatedBy(divider)
+            .iterableSeparatedByNullable(
+              separator: divider,
+            )
             .toList(),
         size: size,
       );
@@ -77,14 +100,15 @@ Wx wxChunkedRectVertical({
 
     if (stretch) {
       itemBits = itemBits.rectWithHeight(
-        height: (rectCtx.height - (dividerCount * dividerThickness)) / count,
+        height: (rectCtx.height - (dividerCount * effectiveDividerThickness)) /
+            count,
       );
 
       return itemsWx(rectCtx.size);
     } else {
       return itemsWx(
         rectCtx.size.withHeight(
-          dividerCount * dividerThickness + itemHeight * count,
+          dividerCount * effectiveDividerThickness + itemHeight * count,
         ),
       ).wxAlignAxis(
         size: rectCtx.size,
@@ -101,7 +125,7 @@ Wx wxChunkedRectVertical({
   final fitCount = itemFitCount(
     available: rectCtx.height,
     itemSize: itemHeight,
-    dividerThickness: dividerThickness,
+    dividerThickness: effectiveDividerThickness,
   );
 
   if (itemCount == fitCount) {
@@ -124,7 +148,7 @@ Wx wxChunkedRectVertical({
         final fitCount = itemFitCount(
           available: rectCtx.height,
           itemSize: itemHeight,
-          dividerThickness: dividerThickness,
+          dividerThickness: effectiveDividerThickness,
         );
 
         startAt = min(startAt, itemCount - fitCount);

@@ -28,6 +28,8 @@ part 'shaft.g.dart';
 
 part 'shaft.g.has.dart';
 
+part 'shaft.freezed.dart';
+
 part 'shaft/render.dart';
 
 part 'shaft/header.dart';

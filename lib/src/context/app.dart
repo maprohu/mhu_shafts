@@ -12,6 +12,8 @@ part 'app.g.dart';
 
 part 'app.g.has.dart';
 
+part 'app.freezed.dart';
+
 @Has()
 class AppObj with MixAppCtx, MixDisposers {
   late final WindowCtx windowCtx;

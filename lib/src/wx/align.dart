@@ -69,6 +69,19 @@ Wx wxAlignVertical({
   );
 }
 
+Wx wxAlignGeometry({
+  @Ext() required Wx wx,
+  @extHas required Size size,
+  required Alignment alignmentGeometry,
+}) {
+  return wxAlign(
+    wx: wx,
+    size: size,
+    vertical: AxisAlignment(value: alignmentGeometry.y),
+    horizontal: AxisAlignment(value: alignmentGeometry.x),
+  );
+}
+
 Wx wxAlign({
   @Ext() required Wx wx,
   @extHas required Size size,

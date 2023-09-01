@@ -207,7 +207,7 @@ int shaftLayoutTotalWidthUnits({
   );
 }
 
-ThemeWrap themeWrapRender({
+ThemeWrap renderCtxThemeWrap({
   @extHas required RenderObj renderObj,
 }) {
   return renderObj.themeWrap;

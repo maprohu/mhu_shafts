@@ -8,7 +8,7 @@ SharingBox menuRectSharingBox({
   required List<MenuItem> items,
   double? itemHeight,
 }) {
-  final themeWrap = rectCtx.themeWrapRender();
+  final themeWrap = rectCtx.renderCtxThemeWrap();
   itemHeight ??= themeWrap.menuItemHeight;
   return rectCtx.chunkedRectVerticalSharingBox(
     itemHeight: itemHeight,

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:isar/isar.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
+import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/shaft_factory.dart';
 
 import '../proto.dart';
-import 'context/app.dart';
 
-import 'context/config.dart';
 import 'screen/app.dart';
 
 import 'init.dart' as $lib;
@@ -17,6 +16,8 @@ import 'init.dart' as $lib;
 part 'init.g.has.dart';
 
 part 'init.g.dart';
+
+part 'init.freezed.dart';
 
 @Has()
 typedef IsarSchemas = List<CollectionSchema>;

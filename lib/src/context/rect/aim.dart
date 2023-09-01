@@ -38,7 +38,7 @@ Wx wxRectAimWatch({
   required AxisAlignment? horizontal,
   required AxisAlignment? vertical,
 }) {
-  final themeWrap = rectCtx.themeWrapRender();
+  final themeWrap = rectCtx.renderCtxThemeWrap();
 
   final aimWxSize = themeWrap.aimWxSize;
 

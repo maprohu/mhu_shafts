@@ -13,6 +13,8 @@ part 'persist.g.dart';
 
 part 'persist.g.has.dart';
 
+part 'persist.freezed.dart';
+
 @Has()
 class PersistObj with MixIsar {
   final flushDisposers = DspImpl();

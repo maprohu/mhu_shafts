@@ -12,9 +12,13 @@ part 'text.g.has.dart';
 
 part 'text.g.dart';
 
+part 'text.freezed.dart';
+
 part 'text/mono.dart';
 
 part 'text/span.dart';
+
+part 'text/wrap.dart';
 
 @Compose()
 abstract class TextCtx implements RectCtx, HasTextStyle {}

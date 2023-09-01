@@ -18,6 +18,8 @@ part 'data.g.dart';
 
 part 'data.g.has.dart';
 
+part 'data.freezed.dart';
+
 @Has()
 class DataObj with MixDataCtx, MixDisposers {
   late final dynamic config;

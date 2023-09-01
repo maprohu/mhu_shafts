@@ -1,11 +1,12 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
+import 'package:mhu_dart_commons/commons.dart';
 
 part 'asset.g.has.dart';
 
 part 'asset.g.dart';
 
-
+part 'asset.freezed.dart';
 
 @Has()
 class AssetObj {

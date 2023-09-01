@@ -13,6 +13,8 @@ part 'shaft_factory.g.has.dart';
 
 part 'shaft_factory.g.dart';
 
+part 'shaft_factory.freezed.dart';
+
 part 'shaft_factory/label.dart';
 
 part 'shaft_factory/data.dart';
