@@ -1,11 +1,15 @@
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
+import 'package:mhu_dart_proto/mhu_dart_proto.dart';
+import 'package:mhu_shafts/mhu_shafts.dart';
+import 'package:mhu_shafts/proto.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
 import 'package:mhu_shafts/src/shaft/error.dart';
 import 'package:mhu_shafts/src/shaft/main_menu.dart';
 import 'package:mhu_shafts/src/shaft/options.dart';
 import 'package:mhu_shafts/src/wx/wx.dart';
+import 'package:protobuf/protobuf.dart';
 
 import 'shaft_factory.dart' as $lib;
 
@@ -23,6 +27,8 @@ part 'shaft_factory/focus.dart';
 
 part 'shaft_factory/menu.dart';
 
+part 'shaft_factory/identifier.dart';
+
 typedef ShaftFactoryKey = int;
 
 @Has()
@@ -32,7 +38,6 @@ typedef ShaftHeaderLabel = WxRectBuilder;
 typedef ShaftOpenerLabel = WxRectBuilder;
 
 @Has()
-@HasDefault(shaftWithoutFocus)
 typedef ShaftFocusHandler = HandlePressedKey?;
 
 @Has()
@@ -41,18 +46,38 @@ typedef ShaftContent = BuildSharingBoxes;
 @Has()
 typedef ShaftInterface = dynamic;
 
+@freezed
+class ShaftIdentifierObj<T> with _$ShaftIdentifierObj<T> {
+  const factory ShaftIdentifierObj({
+    required ShaftFactoryKey shaftFactoryKey,
+    required T shaftIdentifierData,
+  }) = _ShaftIdentifierObj;
+}
+
+@Has()
+typedef ParseShaftIdentifier<T> = ShaftIdentifierObj<T> Function(
+  MshShaftIdentifierMsg shaftIdentifierMsg,
+);
+
 @Compose()
 abstract class ShaftLabel
     implements HasCallShaftHeaderLabel, HasCallShaftOpenerLabel {}
 
 @Compose()
-@Has()
-abstract class ShaftActions
+abstract class ShaftDirectContentActions
+    implements HasShaftFocusHandler, HasShaftContent, HasShaftInterface {}
+
+@Compose()
+abstract class ShaftContentActions
     implements
-        ShaftLabel,
         HasCallShaftFocusHandler,
         HasCallShaftContent,
         HasCallShaftInterface {}
+
+@Compose()
+@Has()
+abstract class ShaftActions
+    implements ShaftLabel, ShaftContentActions, HasCallParseShaftIdentifier {}
 
 @Has()
 typedef BuildShaftActions = ShaftActions Function(ShaftCtx shaftCtx);
@@ -68,7 +93,29 @@ final ShaftFactories mshShaftFactories = Singletons.mixin({
   1: MainMenuShaftFactory(),
   2: OptionsShaftFactory(),
   3: CustomShaftFactory(),
+  100: ProtoFieldShaftFactory(),
 });
+
+late final mshCustomShaftFactoryKey = mshShaftFactories
+    .lookupSingletonByType<CustomShaftFactory>()
+    .getShaftFactoryKey();
+
+ShaftActions mshCustomShaftActions({
+  @ext required ShaftActions shaftActions,
+}) {
+  return shaftActions.shaftActionsWithCallParseShaftIdentifier(
+    lazy(() {
+      return (shaftIdentifierMsg) {
+        return ShaftIdentifierObj(
+          shaftFactoryKey: mshCustomShaftFactoryKey,
+          shaftIdentifierData: shaftActions.callParseShaftIdentifier().call(
+                shaftIdentifierMsg.innerShaftIdentifierMsg(),
+              ),
+        );
+      };
+    }),
+  );
+}
 
 ShaftFactoryKey getShaftFactoryKey({
   @Ext() required ShaftFactory shaftFactory,
@@ -104,4 +151,22 @@ F mshLookupTypeShaftFactory<F extends ShaftFactory>() {
 
 ShaftFactoryKey mshLookupTypeShaftFactoryKey<F extends ShaftFactory>() {
   return mshLookupTypeShaftFactory<F>().singletonKey;
+}
+
+ShaftInterface shaftCtxInterface({
+  @extHas required ShaftObj shaftObj,
+}) {
+  return shaftObj.shaftActions.callShaftInterface();
+}
+
+ShaftContentActions callContentActions({
+  required Call<ShaftDirectContentActions> call,
+}) {
+  late final contentActions = call();
+
+  return ComposedShaftContentActions(
+    callShaftFocusHandler: () => contentActions.shaftFocusHandler,
+    callShaftContent: () => contentActions.shaftContent,
+    callShaftInterface: () => contentActions.shaftInterface,
+  );
 }

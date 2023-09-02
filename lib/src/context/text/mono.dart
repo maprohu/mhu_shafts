@@ -10,21 +10,27 @@ abstract class GridSize implements HasColumnCount, HasRowCount {}
 
 @Compose()
 @Has()
-abstract class MonoTextStyle implements HasSize, HasTextStyle {
-  static const _calcCount = 10000;
+abstract class MonoTextStyle
+    implements HasSize, HasTextStyle, HasTextStyleWrap {}
 
-  static MonoTextStyle from(TextStyle textStyle) => ComposedMonoTextStyle(
-        size: mdiTextSize(
-          Iterable.generate(
-            _calcCount,
-            (_) => "M",
-          ).join(),
-          textStyle,
-        ).let((s) {
-          return Size(s.width / _calcCount, s.height);
-        }),
-        textStyle: textStyle,
-      );
+MonoTextStyle createMonoTextStyle({
+  @ext required TextStyleWrap textStyleWrap,
+}) {
+  const _calcCount = 10000;
+  final textStyle = textStyleWrap.textStyle;
+  return ComposedMonoTextStyle(
+    size: mdiTextSize(
+      Iterable.generate(
+        _calcCount,
+        (_) => "M",
+      ).join(),
+      textStyle,
+    ).let((s) {
+      return Size(s.width / _calcCount, s.height);
+    }),
+    textStyleWrap: textStyleWrap,
+    textStyle: textStyle,
+  );
 }
 
 @Compose()
@@ -37,7 +43,7 @@ MonoTextCtx createMonoTextCtx({
   return ComposedMonoTextCtx.textCtx(
     textCtx: createTextCtx(
       rectCtx: rectCtx,
-      textStyle: monoTextStyle.textStyle,
+      textStyleWrap: monoTextStyle.textStyleWrap,
     ),
     monoTextStyle: monoTextStyle,
   );

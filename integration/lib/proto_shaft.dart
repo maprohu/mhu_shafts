@@ -8,14 +8,19 @@ class SampleProtoShaftFactory extends SampleShaftFactory {
     final scalarValue = sampleFw.toScalarValue;
     final messageCtx =
         sampleObj.schemaLookupByName.lookupMessageCtxOfType<SmpSampleMsg>();
+
+    late final shaftInterface = ComposedProtoMessageShaftInterface(
+      messageCtx: messageCtx,
+    );
     return ComposedShaftActions.shaftLabel(
-      shaftLabel: staticShaftLabel("Sample Proto"),
+      shaftLabel: stringConstantShaftLabel("Sample Proto"),
       callShaftContent: () => protoMessageShaftContent(
         messageCtx: messageCtx,
         scalarValue: scalarValue,
       ),
       callShaftFocusHandler: shaftWithoutFocus,
-      callShaftInterface: voidShaftInterface,
+      callShaftInterface: () => shaftInterface,
+      callParseShaftIdentifier: keyOnlyShaftIdentifier,
     );
   }
 }

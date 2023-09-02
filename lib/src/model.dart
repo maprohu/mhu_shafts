@@ -22,6 +22,9 @@ typedef WindowStateMsg = MshWindowStateMsg;
 @Has()
 typedef ShaftMsg = MshShaftMsg;
 
+@Has()
+typedef ShaftIdentifierMsg = MshShaftIdentifierMsg;
+
 extension MshShaftMsgX on MshShaftMsg {
   @Deprecated('use shaftMsgIterableLeft')
   Iterable<MshShaftMsg> get iterableTowardsLeft =>
@@ -112,4 +115,12 @@ MshShaftMsg? shaftMsgByIndexFromLeft(
   final listTowardsLeft = shaftMsg.shaftMsgIterableLeft().toList();
   final reverseIndex = listTowardsLeft.length - index - 1;
   return listTowardsLeft.getOrNull(reverseIndex);
+}
+
+ShaftIdentifierMsg innerShaftIdentifierMsg({
+  @ext required ShaftIdentifierMsg shaftIdentifierMsg,
+}) {
+  return shaftIdentifierMsg.anyData.data.let(
+    MshShaftIdentifierMsg.fromBuffer,
+  )..freeze();
 }

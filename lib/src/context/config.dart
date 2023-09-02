@@ -12,7 +12,6 @@ part 'config.g.has.dart';
 
 part 'config.g.dart';
 
-part 'config.freezed.dart';
 
 @Compose()
 abstract class ConfigCtx

@@ -1,56 +1,124 @@
 part of 'proto.dart';
 
+@Compose()
+abstract class ProtoMessageShaftInterface
+    implements HasMessageCtx {}
+
 ShaftContent protoMessageShaftContent<M extends Msg>({
   @ext required MessageCtx messageCtx,
   @ext required ScalarValue<M> scalarValue,
 }) {
   return (rectCtx) {
     final msg = scalarValue.watchValue();
+    final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
       final monoTextCtx = rectCtx.createMonoTextCtx(
-        monoTextStyle: rectCtx.renderCtxThemeWrap().stringTextStyle,
+        monoTextStyle: themeWrap.stringMonoTextStyle,
       );
       return [
-        monoTextCtx.monoTextCtxSharingBox(string: "hello"),
+        monoTextCtx.monoTextCtxSharingBox(
+          string: "Data does not exist.",
+        ),
       ];
     }
-    final monoTextCtx = rectCtx.createMonoTextCtx(
-      monoTextStyle: rectCtx.renderCtxThemeWrap().stringTextStyle,
-    );
     return [
-      monoTextCtx.monoTextCtxSharingBox(string: "hello"),
+      rectCtx.chunkedListRectVerticalSharingBox(
+        itemHeight: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
+        items: protoMessageFieldWxRectBuilders(
+          messageCtx: messageCtx,
+          msg: msg,
+        ).toList(),
+      ),
     ];
-    // return [
-    //   rectCtx.chunkedListRectVerticalSharingBox(
-    //     itemHeight: rectCtx.renderObj.themeWrap.protoFieldItemOuterHeight,
-    //     items: [
-    //       ...messageCtx.callLogicalFieldsList().expand((logicalFieldCtx) {
-    //         return pro(
-    //           action: () {},
-    //           label: logicalFieldCtx.fieldProtoName,
-    //         );
-    //       }),
-    //     ],
-    //   ),
-    // ];
   };
 }
 
-Iterable<Wx> protoMessageFieldWx({
-  required LogicalFieldCtx logicalFieldCtx,
-  required double width,
-  required Wx aimWx,
+Iterable<WxRectBuilder> protoMessageFieldWxRectBuilders<M extends Msg>({
+  required MessageCtx messageCtx,
+  required M msg,
+}) sync* {
+  for (final logicalFieldCtx in messageCtx.callLogicalFieldsList()) {
+    switch (logicalFieldCtx) {
+      case FieldCtx():
+        yield protoMessageFieldWxRectBuilder(
+          shaftOpener: mshShaftFactories
+              .factoriesShaftOpenerOf<ProtoFieldShaftFactory>(
+            identifierAnyData: MshShaftIdentifierMsg_Field$.create(
+              tagNumber: logicalFieldCtx.fieldCtxTagNumber(),
+            ).cmnAnyFromMsg(),
+          ),
+          label: logicalFieldCtx.fieldProtoName,
+          value: "<todo>",
+        );
+      case OneofCtx():
+    }
+  }
+}
+
+WxRectBuilder protoMessageFieldWxRectBuilder({
+  required ShaftOpener shaftOpener,
   required String label,
   required String value,
-}) sync* {}
+}) {
+  return (rectCtx) {
+    final themeWrap = rectCtx.renderCtxThemeWrap();
+    return wxRectPaddingSizer(
+      rectCtx: rectCtx,
+      paddingSizer: themeWrap.protoFieldPaddingSizer,
+      builder: (rectCtx) {
+        final labelCtx = rectCtx.rectWithHeight(
+          height: themeWrap.protoFieldLabelHeight,
+        );
+        final labelTextStyleWrap = themeWrap.protoFieldLabelTextStyleWrap;
+
+        final labelWx = labelCtx.wxRectFillRight(
+          left: [
+            rectCtx.wxRectAim(
+              action: shaftOpener.openShaftAction(
+                shaftCtx: rectCtx,
+              ),
+              horizontal: null,
+              vertical: AxisAlignment.center,
+            ),
+          ],
+          right: (rectCtx) {
+            return rectCtx
+                .createTextCtx(
+                  textStyleWrap: labelTextStyleWrap,
+                )
+                .wxTextAlign(
+                  text: label,
+                );
+          },
+        );
+
+        final valueWx = rectCtx
+            .createTextCtx(
+                textStyleWrap: themeWrap.protoFieldValueTextStyleWrap)
+            .wxTextHorizontal(text: value);
+
+        return rectCtx.wxRectColumnExact(
+          children: [
+            labelWx,
+            rectCtx
+                .rectWithHeight(height: themeWrap.protoFieldLabelValueGapHeight)
+                .wxEmpty(),
+            valueWx,
+          ],
+        );
+      },
+    ).wxDecorateShaftOpener(
+      shaftOpener: shaftOpener,
+      shaftCtx: rectCtx,
+    );
+  };
+}
 
 double calculateProtoMessageFieldItemInnerHeight({
   @ext required ThemeWrap themeWrap,
 }) {
-  return max(
-    themeWrap.aimWxSize.height,
-    themeWrap.protoFieldLabelTextStyleWrap.textHeight +
-        themeWrap.protoFieldValueTextStyleWrap.textHeight +
-        themeWrap.protoFieldLabelValueGapHeight,
-  );
+  return themeWrap.protoFieldLabelHeight +
+      themeWrap.protoFieldLabelValueGapHeight +
+      themeWrap.protoFieldValueTextStyleWrap.callTextHeight();
 }
+

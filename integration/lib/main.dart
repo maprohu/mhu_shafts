@@ -11,7 +11,7 @@ import 'proto.dart';
 part 'main.g.has.dart';
 part 'main.g.dart';
 
-part 'main.freezed.dart';
+// part 'main.freezed.dart';
 
 part 'main_menu.dart';
 

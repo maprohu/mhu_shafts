@@ -17,7 +17,6 @@ part 'init.g.has.dart';
 
 part 'init.g.dart';
 
-part 'init.freezed.dart';
 
 @Has()
 typedef IsarSchemas = List<CollectionSchema>;

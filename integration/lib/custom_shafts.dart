@@ -1,21 +1,19 @@
 part of 'main.dart';
 
 ShaftActions sampleCustomShaftActions(ShaftCtx shaftCtx) {
-  final shaftIdentifier = shaftCtx.shaftObj.shaftIdentifier.anyData.data.let(
-    MshShaftIdentifierMsg.fromBuffer,
-  )..freeze();
+  final shaftIdentifier = shaftCtx.shaftCtxInnerIdentifierMsg();
 
   return sampleShaftFactories
       .shaftFactoriesLookupKey(
         shaftFactoryKey: shaftIdentifier.shaftFactoryKey,
       )
-      .buildShaftActions(shaftCtx);
+      .buildShaftActions(shaftCtx)
+      .mshCustomShaftActions();
 }
 
 abstract class SampleShaftFactory extends ShaftFactory {}
 
-final ShaftFactories sampleShaftFactories =
-    Singletons.mixin({
+final ShaftFactories sampleShaftFactories = Singletons.mixin({
   0: SampleProtoShaftFactory(),
 });
 

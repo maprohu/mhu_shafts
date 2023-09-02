@@ -166,7 +166,7 @@ Wx wxChunkedRectVertical({
         ),
         rectCtx
             .rectWithHeight(
-              height: themeWrap.chunkedFooterOuterHeight,
+              height: themeWrap.chunkedFooterPaddingSizer.callOuterHeight(),
             )
             .wxEmpty(),
       ],

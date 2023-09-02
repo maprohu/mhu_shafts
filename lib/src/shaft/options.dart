@@ -10,7 +10,7 @@ class OptionsShaftFactory extends ShaftFactory {
   @override
   ShaftActions buildShaftActions(ShaftCtx shaftCtx) {
     return ComposedShaftActions.shaftLabel(
-      shaftLabel: staticShaftLabel("Options"),
+      shaftLabel: stringConstantShaftLabel("Options"),
       callShaftContent: shaftMenuContent((shaftCtx) {
         final closeAction = shaftCtx.shaftObj.shaftOnLeft?.shaftCloseAction();
         return [
@@ -24,6 +24,7 @@ class OptionsShaftFactory extends ShaftFactory {
       }),
       callShaftFocusHandler: shaftWithoutFocus,
       callShaftInterface: voidShaftInterface,
+      callParseShaftIdentifier: keyOnlyShaftIdentifier,
     );
   }
 }

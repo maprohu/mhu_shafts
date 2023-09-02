@@ -5,7 +5,7 @@ TextCtx shaftHeaderLabelText({
 }) {
   return createTextCtx(
     rectCtx: rectCtx,
-    textStyle: rectCtx.renderObj.themeWrap.shaftHeaderTextStyle,
+    textStyleWrap: rectCtx.renderCtxThemeWrap().shaftHeaderTextStyleWrap,
   );
 }
 

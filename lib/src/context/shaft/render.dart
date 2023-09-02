@@ -14,34 +14,32 @@ ShaftLayout renderShaft({
 
   final optionsOpener = mshShaftOpenerOf<OptionsShaftFactory>();
 
-  final headerWx = rectCtx
-      .rectWithHeight(height: themeWrap.shaftHeaderOuterHeight)
-      .wxRectPadding(
-        padding: themeWrap.shaftHeaderPadding,
-        builder: (rectCtx) {
-          return rectCtx.wxRectFillLeft(
-            left: (rectCtx) {
-              return shaftObj.shaftActions.callShaftHeaderLabel().call(rectCtx);
-            },
-            right: [
-              rectCtx
-                  .wxRectAim(
-                    action: () {
-                      optionsOpener.openShaftOpener(
-                        shaftCtx: rectCtx,
-                      );
-                    },
-                    horizontal: null,
-                    vertical: AxisAlignment.center,
-                  )
-                  .wxDecorateShaftOpener(
-                    shaftOpener: optionsOpener,
-                    shaftCtx: rectCtx,
-                  ),
-            ],
-          );
+  final headerWx = rectCtx.wxRectPaddingSizer(
+    paddingSizer: themeWrap.shaftHeaderPaddingSizer,
+    builder: (rectCtx) {
+      return rectCtx.wxRectFillLeft(
+        left: (rectCtx) {
+          return shaftObj.shaftActions.callShaftHeaderLabel().call(rectCtx);
         },
+        right: [
+          rectCtx
+              .wxRectAim(
+                action: () {
+                  optionsOpener.openShaftOpener(
+                    shaftCtx: rectCtx,
+                  );
+                },
+                horizontal: null,
+                vertical: AxisAlignment.center,
+              )
+              .wxDecorateShaftOpener(
+                shaftOpener: optionsOpener,
+                shaftCtx: rectCtx,
+              ),
+        ],
       );
+    },
+  );
 
   final wx = rectCtx.wxRectFillBottom(
     top: [

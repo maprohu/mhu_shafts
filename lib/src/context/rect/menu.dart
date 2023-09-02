@@ -1,7 +1,11 @@
 part of '../rect.dart';
 
+@Has()
+typedef WatchMenuItemSelected = WatchValue<bool>;
+
 @Compose()
-abstract class MenuItem implements HasWatchAimAction, HasWxRectBuilder {}
+abstract class MenuItem
+    implements HasWatchAimAction, HasWxRectBuilder, HasWatchMenuItemSelected {}
 
 SharingBox menuRectSharingBox({
   @ext required RectCtx rectCtx,
@@ -9,28 +13,36 @@ SharingBox menuRectSharingBox({
   double? itemHeight,
 }) {
   final themeWrap = rectCtx.renderCtxThemeWrap();
-  itemHeight ??= themeWrap.menuItemHeight;
+  itemHeight ??= themeWrap.menuItemPaddingSizer.callOuterHeight();
   return rectCtx.chunkedRectVerticalSharingBox(
     itemHeight: itemHeight,
     itemCount: items.length,
     startAt: 0,
     itemBuilder: (index, rectCtx) {
       final item = items[index];
-      return rectCtx.wxRectPadding(
-        padding: themeWrap.menuItemPadding,
-        builder: (rectCtx) {
-          return rectCtx.wxRectFillRight(
-            left: [
-              rectCtx.wxRectAimWatch(
-                watchAction: item.watchAimAction,
-                horizontal: null,
-                vertical: AxisAlignment.center,
-              ),
-            ],
-            right: item.wxRectBuilder,
+      return rectCtx
+          .wxRectPaddingSizer(
+            paddingSizer: themeWrap.menuItemPaddingSizer,
+            builder: (rectCtx) {
+              return rectCtx.wxRectFillRight(
+                left: [
+                  rectCtx.wxRectAimWatch(
+                    watchAction: item.watchAimAction,
+                    horizontal: null,
+                    vertical: AxisAlignment.center,
+                  ),
+                ],
+                right: item.wxRectBuilder,
+              );
+            },
+          )
+          .wxAlignVertical(
+            size: rectCtx.size,
+          )
+          .wxDecorateShaftOpenBool(
+            isOpen: item.watchMenuItemSelected(),
+            themeWrap: themeWrap,
           );
-        },
-      );
     },
     dividerThickness: themeWrap.menuItemsDividerThickness,
   );
@@ -48,16 +60,19 @@ MenuItem menuItemStatic({
         label: label,
       );
     },
+    watchMenuItemSelected: () => false,
   );
 }
 
 MenuItem menuItemStaticAction({
   required VoidCallback action,
   required WxRectBuilder wxRectBuilder,
+  required WatchMenuItemSelected watchMenuItemSelected,
 }) {
   return ComposedMenuItem(
     watchAimAction: () => action,
     wxRectBuilder: wxRectBuilder,
+    watchMenuItemSelected: watchMenuItemSelected,
   );
 }
 
@@ -96,23 +111,23 @@ MenuItem shaftOpenerMenuItem({
   @ext required ShaftOpener shaftOpener,
   @ext required ShaftCtx shaftCtx,
 }) {
-  final openedShaftCtx = shaftOpener
-      .openerShaftMsg()
-      .addShaftMsgParent(shaftCtx: shaftCtx)
-      .createShaftCtx(
-        renderCtx: shaftCtx,
-        shaftOnRight: null,
-      );
-
+  final openedShaftCtx = createOpenedShaftCtx(
+    shaftOpener: shaftOpener,
+    shaftCtx: shaftCtx,
+  );
   final shaftObj = openedShaftCtx.shaftObj;
 
   return menuItemStaticAction(
-    action: () {
-      shaftOpener.openShaftOpener(
+    action: shaftOpener.openShaftAction(
+      shaftCtx: shaftCtx,
+    ),
+    wxRectBuilder: shaftObj.shaftActions.callShaftOpenerLabel(),
+    watchMenuItemSelected: () {
+      return isShaftOpen(
+        shaftOpener: shaftOpener,
         shaftCtx: shaftCtx,
       );
     },
-    wxRectBuilder: shaftObj.shaftActions.callShaftOpenerLabel(),
   );
 }
 
@@ -121,7 +136,7 @@ TextCtx menuItemText({
 }) {
   return createTextCtx(
     rectCtx: rectCtx,
-    textStyle: rectCtx.renderObj.themeWrap.menuItemTextStyle,
+    textStyleWrap: rectCtx.renderObj.themeWrap.menuItemTextStyleWrap,
   );
 }
 

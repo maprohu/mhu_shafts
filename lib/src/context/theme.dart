@@ -16,6 +16,7 @@ part 'theme.g.dart';
 
 part 'theme.g.has.dart';
 
+part 'theme/padding.dart';
 
 @Has()
 typedef ThemeMsg = MshThemeMsg;
@@ -54,34 +55,25 @@ class ThemeWrap with MixAppCtx, MixThemeMsg {
   late final shaftBackgroundColor = grayscale(3 / 16);
   late final dividerColor = grayscale(5 / 16);
 
-  late final robotoMonoTextStyle = assetObj.robotoMonoFont.copyWith(
-    fontSize: 14,
-    color: Colors.white,
-  );
+  late final defaultTextStyleSize = 14.0;
+  late final defaultTextStyleColor = Colors.white;
 
-  late final robotoSlabTextStyle = assetObj.robotoSlabFont.copyWith(
-    fontSize: 14,
-    color: Colors.white,
-  );
+  late final defaultMonoTextStyle = assetObj.robotoMonoFont
+      .themeTextStyleWithDefaults(themeWrap: this)
+      .wrapTextStyle()
+      .createMonoTextStyle();
+  late final defaultTextStyleWrap = assetObj.robotoSlabFont
+      .themeTextStyleWithDefaults(themeWrap: this)
+      .wrapTextStyle();
 
-  late final builtinTextStyle = const TextStyle(
-    fontSize: 14,
-  );
+  late final aimTextStyleWrap = defaultMonoTextStyle.textStyleWrap
+      .textStyleWrapWithColor(color: Colors.yellow);
+  late final aimPressedTextStyleWrap = defaultMonoTextStyle.textStyleWrap
+      .textStyleWrapWithColor(color: Colors.red);
 
-  late final defaultTextStyle = robotoMonoTextStyle;
-
-  late final aimTextStyle = defaultTextStyle.copyWith(
-    color: Colors.yellow,
-  );
-  late final aimPressedTextStyle = defaultTextStyle.copyWith(
-    color: Colors.red,
-  );
-
-  late final shaftHeaderTextStyle = defaultTextStyle;
-  late final menuItemTextStyle = defaultTextStyle;
-  late final splitMarkerTextStyle = defaultTextStyle.copyWith(
-    color: Colors.red,
-  );
+  late final shaftHeaderTextStyleWrap = defaultTextStyleWrap;
+  late final menuItemTextStyleWrap = defaultTextStyleWrap;
+  late final textSplitMarkerColor = Colors.red;
 
   late final aimWxSize = aimTextSpan(
     aimState: const AimState(
@@ -91,40 +83,23 @@ class ThemeWrap with MixAppCtx, MixThemeMsg {
     themeWrap: this,
   ).size;
 
-  late final shaftHeaderTextHeight =
-      mdiTextSize("M", shaftHeaderTextStyle).height;
+  late final shaftHeaderPaddingSizer =
+      shaftHeaderTextStyleWrap.themeAimWithTextPaddingSizer(themeWrap: this);
+  late final menuItemPaddingSizer =
+      menuItemTextStyleWrap.themeAimWithTextPaddingSizer(themeWrap: this);
 
-  late final shaftHeaderContentHeight =
-      max(shaftHeaderTextHeight, aimWxSize.height);
+  late final stringMonoTextStyle = defaultMonoTextStyle;
 
-  late final shaftHeaderPadding = defaultPadding;
+  late final chunkedFooterTextStyleWrap = defaultTextStyleWrap;
 
-  late final shaftHeaderOuterHeight =
-      shaftHeaderContentHeight + shaftHeaderPadding.vertical;
-  late final shaftHeaderWithDividerHeight =
-      shaftHeaderOuterHeight + shaftHeaderDividerThickness;
-
-  late final menuItemInnerHeight = aimWxSize.height;
-
-  late final menuItemHeight = menuItemPadding.vertical + menuItemInnerHeight;
-
-  late final menuItemPadding = defaultPadding;
-
-  late final stringTextStyle = MonoTextStyle.from(robotoMonoTextStyle);
-
-  late final chunkedFooterTextStyle = MonoTextStyle.from(robotoMonoTextStyle);
-
-  late final chunkedFooterInnerHeight = chunkedFooterTextStyle.height;
-  late final chunkedFooterOuterHeight =
-      chunkedFooterInnerHeight + chunkedFooterPadding.vertical;
-
-  late final chunkedFooterPadding = const EdgeInsets.all(2);
+  late final chunkedFooterPaddingSizer =
+      chunkedFooterTextStyleWrap.themeAimWithTextPaddingSizer(themeWrap: this);
 
   late final textCursorThickness = 2.0;
   late final textCursorColor = Colors.red;
   late final textClipMarkerColor = Colors.red;
 
-  late final notificationTextStyle = robotoSlabTextStyle;
+  late final notificationTextStyleWrap = defaultTextStyleWrap;
 
   static Color grayscale(double value) {
     final rgb = (value * 255).round();
@@ -136,28 +111,22 @@ class ThemeWrap with MixAppCtx, MixThemeMsg {
   late final longRunningTaskCompleteNotificationColor = Colors.green;
   late final longRunningTaskCompleteIconData = Icons.notification_important;
 
-  late final textSplitMarker = this.themeTextSplitMarkBuilder();
+  late final protoFieldLabelTextStyleWrap = menuItemTextStyleWrap;
+  late final protoFieldLabelHeight =
+      protoFieldLabelTextStyleWrap.themeAimWithTextHeight(themeWrap: this);
 
-  late final protoFieldLabelTextStyleWrap = menuItemTextStyle.textStyleWrap();
-  late final protoFieldValueTextStyleWrap = robotoSlabTextStyle
-      .copyWith(
-        fontSize:
-            protoFieldLabelTextStyleWrap.textStyle.fontSize?.let((e) => e - 1),
-      )
-      .textStyleWrap();
+  late final protoFieldValueTextStyleWrap =
+      defaultTextStyleWrap.textStyleWrapWithFontSize(
+    fontSize: protoFieldLabelTextStyleWrap.textStyle.fontSize! - 1,
+  );
+
   late final protoFieldLabelValueGapHeight = 1.0;
 
   late final protoFieldItemInnerHeight =
       this.calculateProtoMessageFieldItemInnerHeight();
 
-  late final protoFieldItemInnerSize = Size(0, protoFieldItemInnerHeight);
-
-  late final protoFieldItemPadding = defaultPadding;
-
-  late final protoFieldItemOuterSize =
-      protoFieldItemPadding.inflateSize(protoFieldItemInnerSize);
-
-  late final protoFieldItemOuterHeight = protoFieldItemOuterSize.height;
+  late final protoFieldPaddingSizer =
+      this.themePaddingSizer(innerHeight: protoFieldItemInnerHeight);
 }
 
 ThemeWrap createThemeWrap({
@@ -172,8 +141,11 @@ ThemeWrap createThemeWrap({
 
 WxHeightBuilder themeTextSplitMarkBuilder({
   @ext required ThemeWrap themeWrap,
+  required TextStyle textStyle,
 }) {
-  final textSpan = themeWrap.splitMarkerTextStyle.createTextSpan("?");
+  final textSpan = textStyle
+      .copyWith(color: themeWrap.textSplitMarkerColor)
+      .createTextSpan("?");
   final size = textSpan.size;
   final widget = RichText(
     text: textSpan,
@@ -191,4 +163,24 @@ WxHeightBuilder themeTextSplitMarkBuilder({
       axisAlignment: AxisAlignment.center,
     );
   };
+}
+
+TextStyle themeTextStyleWithDefaults({
+  @ext required TextStyle textStyle,
+  @ext required ThemeWrap themeWrap,
+}) {
+  return textStyle.copyWith(
+    fontSize: themeWrap.defaultTextStyleSize,
+    color: themeWrap.defaultTextStyleColor,
+  );
+}
+
+double themeAimWithTextHeight({
+  @ext required ThemeWrap themeWrap,
+  @ext required TextStyleWrap textStyleWrap,
+}) {
+  return max(
+    themeWrap.aimWxSize.height,
+    textStyleWrap.callTextHeight(),
+  );
 }

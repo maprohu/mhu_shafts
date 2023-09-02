@@ -2,7 +2,7 @@ part of 'main.dart';
 
 ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
   return ComposedShaftActions.shaftLabel(
-    shaftLabel: staticShaftLabel("Main Menu"),
+    shaftLabel: stringConstantShaftLabel("Main Menu"),
     callShaftContent: shaftMenuContent((shaftCtx) {
       return [
         sampleShaftOpener<SampleProtoShaftFactory>().shaftOpenerMenuItem(
@@ -16,5 +16,6 @@ ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
     }),
     callShaftFocusHandler: shaftWithoutFocus,
     callShaftInterface: voidShaftInterface,
+    callParseShaftIdentifier: keyOnlyShaftIdentifier,
   );
 }

@@ -79,9 +79,9 @@ Bx stringBx({
   return sizedBits.topLeft(linesCol);
 }
 
-abstract class HasTextStyle {
-  TextStyle get textStyle;
-}
+// abstract class HasTextStyle {
+//   TextStyle get textStyle;
+// }
 
 extension StringHasTextStyleX on HasTextStyle {
   TextSpan span(String text) => textStyle.span(text);

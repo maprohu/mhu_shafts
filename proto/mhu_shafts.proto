@@ -51,14 +51,12 @@ message MshShaftNotificationMsg {
 message MshShaftIdentifierMsg {
   int32 shaft_factory_key = 1;
   CmnAny any_data = 2;
-//  oneof type {
-//    MshViewTaskMsg view_task = 5;
-//
-//    MshConcreteFieldMsg concrete_field = 100;
-//    MshOneofFieldMsg oneof_field = 101;
-//    MshMapEntryKeyMsg map_entry = 102;
-//  }
+
+  message Field {
+    int32 tag_number = 1;
+  }
 }
+
 
 // identifier
 

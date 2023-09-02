@@ -18,15 +18,15 @@ CallShaftHeaderLabel stringShaftHeaderLabel(
   };
 }
 
-ShaftLabel staticShaftLabel(
+ShaftLabel stringConstantShaftLabel(
   String label,
 ) {
-  return stringShaftLabel(
+  return stingCallShaftLabel(
     label.toCall,
   );
 }
 
-ShaftLabel stringShaftLabel(
+ShaftLabel stingCallShaftLabel(
   String Function() label,
 ) {
   return ComposedShaftLabel(

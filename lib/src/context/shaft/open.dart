@@ -36,6 +36,19 @@ void openShaftMsg({
   });
 }
 
+ShaftCtx createOpenedShaftCtx({
+  @ext required ShaftOpener shaftOpener,
+  @ext required ShaftCtx shaftCtx,
+}) {
+  return shaftOpener
+      .openerShaftMsg()
+      .addShaftMsgParent(shaftCtx: shaftCtx)
+      .createShaftCtx(
+        renderCtx: shaftCtx,
+        shaftOnRight: null,
+      );
+}
+
 @Has()
 typedef UpdateShaftIdentifier = void Function(
   MshShaftIdentifierMsg shaftIdentifierMsg,
@@ -69,9 +82,28 @@ bool isShaftOpen({
     return false;
   }
 
-  final shaftIdentifier = shaftOpener.openerShaftIdentifierMsg();
+  final rightIdentifierObj = shaftOnRight.shaftIdentifierObj;
 
-  return shaftOnRight.shaftMsg.shaftIdentifier == shaftIdentifier;
+  final openerIdentifierObj = createOpenedShaftCtx(
+    shaftOpener: shaftOpener,
+    shaftCtx: shaftCtx,
+  ).shaftObj.shaftIdentifierObj;
+
+  return rightIdentifierObj == openerIdentifierObj;
+}
+
+Wx wxDecorateShaftOpenBool({
+  @ext required Wx wx,
+  required bool isOpen,
+  @ext required ThemeWrap themeWrap,
+}) {
+  if (isOpen) {
+    return wx.wxBackgroundColor(
+      color: themeWrap.openerIsOpenBackgroundColor,
+    );
+  } else {
+    return wx;
+  }
 }
 
 Wx wxDecorateShaftOpener({
@@ -79,13 +111,11 @@ Wx wxDecorateShaftOpener({
   @ext required ShaftOpener shaftOpener,
   @ext required ShaftCtx shaftCtx,
 }) {
-  if (isShaftOpen(shaftOpener: shaftOpener, shaftCtx: shaftCtx)) {
-    return wx.wxBackgroundColor(
-      color: shaftCtx.renderObj.themeWrap.openerIsOpenBackgroundColor,
-    );
-  } else {
-    return wx;
-  }
+  return wxDecorateShaftOpenBool(
+    wx: wx,
+    isOpen: isShaftOpen(shaftOpener: shaftOpener, shaftCtx: shaftCtx),
+    themeWrap: shaftCtx.renderCtxThemeWrap(),
+  );
 }
 
 UpdateShaftIdentifier factoriesUpdateShaftIdentifier<F extends ShaftFactory>({
@@ -157,6 +187,18 @@ ShaftMsg openerShaftMsg({
   shaftOpener.updateShaftIdentifier(shaftMsg.ensureShaftIdentifier());
   shaftOpener.updateShaftInnerState(shaftMsg.ensureInnerState());
   return shaftMsg..freeze();
+}
+
+VoidCallback openShaftAction({
+  @ext required ShaftCtx shaftCtx,
+  @ext required ShaftOpener shaftOpener,
+}) {
+  return () {
+    openShaftOpener(
+      shaftCtx: shaftCtx,
+      shaftOpener: shaftOpener,
+    );
+  };
 }
 
 void openShaftOpener({

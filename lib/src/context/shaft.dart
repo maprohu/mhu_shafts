@@ -28,13 +28,13 @@ part 'shaft.g.dart';
 
 part 'shaft.g.has.dart';
 
-part 'shaft.freezed.dart';
-
 part 'shaft/render.dart';
 
 part 'shaft/header.dart';
 
 part 'shaft/open.dart';
+
+part 'shaft/text.dart';
 
 @Has()
 class ShaftObj with MixShaftCtx, MixShaftMsg {
@@ -78,6 +78,9 @@ class ShaftObj with MixShaftCtx, MixShaftMsg {
     shaftFactoryKey: shaftFactoryKey,
   ).buildShaftActions(shaftCtx);
 
+  late final shaftIdentifierObj =
+      shaftIdentifier.parseShaftIdentifier(shaftObj: this);
+
 }
 
 @Compose()
@@ -112,7 +115,7 @@ ShaftMsg? readShaftMsg({
   return shaftObj.shaftCtx.windowObj.windowStateFw
       .read()
       .getEffectiveTopShaft()
-      .shaftByIndexFromLeft(shaftObj.indexFromLeft);
+      .shaftMsgByIndexFromLeft(shaftObj.indexFromLeft);
 }
 
 // Fu<MshShaftMsg> shaftMsgFuByIndex({
@@ -135,3 +138,23 @@ ShaftMsg? readShaftMsg({
 //   );
 // }
 
+ShaftIdentifierObj parseShaftIdentifier({
+  @extHas required ShaftObj shaftObj,
+  @ext required MshShaftIdentifierMsg shaftIdentifierMsg,
+}) {
+  return shaftObj.shaftActions
+      .callParseShaftIdentifier()
+      .call(shaftIdentifierMsg);
+}
+
+ShaftIdentifierMsg shaftCtxInnerIdentifierMsg({
+  @extHas required ShaftObj shaftObj,
+}) {
+  return shaftObj.shaftIdentifier.innerShaftIdentifierMsg();
+}
+
+ShaftCtx shaftCtxOnLeft({
+  @extHas required ShaftObj shaftObj,
+}) {
+  return shaftObj.shaftOnLeft!.shaftCtx;
+}

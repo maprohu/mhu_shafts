@@ -12,8 +12,6 @@ part 'text.g.has.dart';
 
 part 'text.g.dart';
 
-part 'text.freezed.dart';
-
 part 'text/mono.dart';
 
 part 'text/span.dart';
@@ -21,22 +19,31 @@ part 'text/span.dart';
 part 'text/wrap.dart';
 
 @Compose()
-abstract class TextCtx implements RectCtx, HasTextStyle {}
+abstract class TextCtx implements RectCtx, HasTextStyleWrap, HasTextStyle {}
 
 TextCtx createTextCtx({
   @ext required RectCtx rectCtx,
-  required TextStyle textStyle,
+  required TextStyleWrap textStyleWrap,
 }) {
   return ComposedTextCtx.rectCtx(
     rectCtx: rectCtx,
-    textStyle: textStyle,
+    textStyleWrap: textStyleWrap,
+    textStyle: textStyleWrap.textStyle,
+  );
+}
+
+TextCtx defaultTextCtx({
+  @ext required RectCtx rectCtx,
+}) {
+  return rectCtx.createTextCtx(
+    textStyleWrap: rectCtx.renderCtxThemeWrap().defaultTextStyleWrap,
   );
 }
 
 Wx wxTextAlign({
   @Ext() required TextCtx textCtx,
   required String text,
-  required Alignment alignmentGeometry,
+  Alignment alignmentGeometry = Alignment.centerLeft,
 }) {
   return textCtx.wxText(
     text: text,
@@ -66,7 +73,9 @@ Wx wxText({
 }) {
   final textStyle = textCtx.textStyle;
   final maxWidth = textCtx.sizeWidth();
-  final splitMarker = textCtx.renderObj.themeWrap.textSplitMarker;
+  final themeWrap = textCtx.renderCtxThemeWrap();
+  final splitMarkerBuilder =
+      themeWrap.themeTextSplitMarkBuilder(textStyle: textStyle);
 
   final textSpan = TextSpan(
     text: text,
@@ -90,7 +99,7 @@ Wx wxText({
       horizontal: horizontal,
     );
   } else {
-    final split = splitMarker(textSpanSize.height);
+    final split = splitMarkerBuilder(textSpanSize.height);
     final splitWidth = split.width;
     final halfWidth = (maxWidth - split.width) / 2;
 

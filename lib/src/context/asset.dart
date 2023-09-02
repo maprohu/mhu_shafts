@@ -6,7 +6,6 @@ part 'asset.g.has.dart';
 
 part 'asset.g.dart';
 
-part 'asset.freezed.dart';
 
 @Has()
 class AssetObj {

@@ -18,7 +18,6 @@ part 'rect.g.dart';
 
 part 'rect.g.has.dart';
 
-part 'rect.freezed.dart';
 
 part 'rect/fill.dart';
 
@@ -33,6 +32,7 @@ part 'rect/chunk.dart';
 part 'rect/sharing_box.dart';
 
 part 'rect/menu.dart';
+part 'rect/linear.dart';
 
 @Has()
 typedef WxRectBuilder = Wx Function(RectCtx rectCtx);

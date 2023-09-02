@@ -1,3 +1,4 @@
+import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/context/text.dart';
 import 'package:mhu_shafts/src/screen/opener.dart';
@@ -12,3 +13,4 @@ class CustomShaftFactory extends ShaftFactory {
     return shaftCtx.customShaftActions.buildCustomShaftActions(shaftCtx);
   }
 }
+

@@ -8,11 +8,11 @@ TextSpan aimTextSpan({
     children: [
       TextSpan(
         text: aimState.pressed,
-        style: themeWrap.aimPressedTextStyle,
+        style: themeWrap.aimPressedTextStyleWrap.textStyle,
       ),
       TextSpan(
         text: aimState.notPressed,
-        style: themeWrap.aimTextStyle,
+        style: themeWrap.aimTextStyleWrap.textStyle,
       ),
     ],
   );
