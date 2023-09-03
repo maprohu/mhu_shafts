@@ -33,6 +33,7 @@ part 'rect/sharing_box.dart';
 
 part 'rect/menu.dart';
 part 'rect/linear.dart';
+part 'rect/text.dart';
 
 @Has()
 typedef WxRectBuilder = Wx Function(RectCtx rectCtx);

@@ -1,8 +1,11 @@
 part of 'proto.dart';
 
+@Has()
+typedef MsgScalarValue<M extends Msg> = ScalarValue<M>;
+
 @Compose()
 abstract class ProtoMessageShaftInterface
-    implements HasMessageCtx {}
+    implements HasMessageCtx, HasMsgScalarValue {}
 
 ShaftContent protoMessageShaftContent<M extends Msg>({
   @ext required MessageCtx messageCtx,
@@ -12,14 +15,9 @@ ShaftContent protoMessageShaftContent<M extends Msg>({
     final msg = scalarValue.watchValue();
     final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
-      final monoTextCtx = rectCtx.createMonoTextCtx(
-        monoTextStyle: themeWrap.stringMonoTextStyle,
+      return rectCtx.rectMessageSharingBoxes(
+        message: "Data does not exist.",
       );
-      return [
-        monoTextCtx.monoTextCtxSharingBox(
-          string: "Data does not exist.",
-        ),
-      ];
     }
     return [
       rectCtx.chunkedListRectVerticalSharingBox(
@@ -41,8 +39,8 @@ Iterable<WxRectBuilder> protoMessageFieldWxRectBuilders<M extends Msg>({
     switch (logicalFieldCtx) {
       case FieldCtx():
         yield protoMessageFieldWxRectBuilder(
-          shaftOpener: mshShaftFactories
-              .factoriesShaftOpenerOf<ProtoFieldShaftFactory>(
+          shaftOpener:
+              mshShaftFactories.factoriesShaftOpenerOf<ProtoFieldShaftFactory>(
             identifierAnyData: MshShaftIdentifierMsg_Field$.create(
               tagNumber: logicalFieldCtx.fieldCtxTagNumber(),
             ).cmnAnyFromMsg(),
@@ -121,4 +119,3 @@ double calculateProtoMessageFieldItemInnerHeight({
       themeWrap.protoFieldLabelValueGapHeight +
       themeWrap.protoFieldValueTextStyleWrap.callTextHeight();
 }
-

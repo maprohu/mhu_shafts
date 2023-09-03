@@ -13,7 +13,6 @@ part 'persist.g.dart';
 
 part 'persist.g.has.dart';
 
-
 @Has()
 class PersistObj with MixIsar {
   final flushDisposers = DspImpl();
@@ -59,22 +58,10 @@ MshIsarSingletonFwFactory<M>
   @Ext() required CreateValue<M> createValue,
   DefaultValue? defaultValue,
 }) {
-  return ComposedIsarSingletonFwFactory(
-    singletonKeyHolder: SingletonKeyHolder(),
-    createIsarSingletonFw: ({
-      required disposers,
-      required isarSingletonCollection,
-      required isarSingletonId,
-    }) {
-      return isarSingletonCollection.createIsarBlobRecordWriteOnlyFw(
-        id: isarSingletonId,
-        createRecord: MshSingletonRecord.new,
-        bidi: BiDi.proto(createValue),
-        defaultValue: defaultValue ?? createValue()
-          ..freeze(),
-        disposers: disposers,
-      );
-    },
+  return createIsarSingletonProtoWriteOnlyFwFactory(
+    createValue: createValue,
+    createRecord: MshSingletonRecord.new,
+    defaultValue: defaultValue,
   );
 }
 
@@ -145,8 +132,8 @@ class PersistObjSingletonFactoryMarker<M extends Msg,
 //       );
 // }
 
-Future<Fw<M>> producePersistObjSingletonFw<M extends Msg>({
-  @Ext() required MshIsarSingletonFwFactory<M> isarSingletonFwFactory,
+Future<Fw<M>> mshProducePersistObjSingletonFw<M extends Msg>({
+  @ext required MshIsarSingletonFwFactory<M> isarSingletonFwFactory,
   required PersistObj persistObj,
 }) {
   return isarSingletonFwFactory.produceIsarSingletonFw(

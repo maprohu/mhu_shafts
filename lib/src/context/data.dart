@@ -47,22 +47,22 @@ Future<DataCtx> createDataCtx({
     ..windowStateFw = MshWindowStateMsg$Fw(
       await isarSingletonFwFactories
           .lookupSingletonByType<MshWindowStateIsarSingletonFwFactory>()
-          .producePersistObjSingletonFw(persistObj: persistObj),
+          .mshProducePersistObjSingletonFw(persistObj: persistObj),
     )
     ..themeFw = MshThemeMsg$Fw(
       await isarSingletonFwFactories
           .lookupSingletonByType<MshThemeIsarSingletonFwFactory>()
-          .producePersistObjSingletonFw(persistObj: persistObj),
+          .mshProducePersistObjSingletonFw(persistObj: persistObj),
     )
     ..sequencesFw = MshSequencesMsg$Fw(
       await isarSingletonFwFactories
           .lookupSingletonByType<MshSequencesIsarSingletonFwFactory>()
-          .producePersistObjSingletonFw(persistObj: persistObj),
+          .mshProducePersistObjSingletonFw(persistObj: persistObj),
     )
     ..notificationsFw = MshShaftNotificationsMsg$Fw(
       await isarSingletonFwFactories
           .lookupSingletonByType<MshShaftNotificationsIsarSingletonFwFactory>()
-          .producePersistObjSingletonFw(persistObj: persistObj),
+          .mshProducePersistObjSingletonFw(persistObj: persistObj),
     );
 
   return ComposedDataCtx.persistCtx(

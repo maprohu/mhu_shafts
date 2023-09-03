@@ -2,7 +2,6 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_shafts/proto.dart';
-import 'package:mhu_dart_proto/mhu_dart_proto.dart';
 
 import 'app.dart';
 import 'context/shaft.dart';
@@ -50,18 +49,18 @@ extension MshShaftMsgX on MshShaftMsg {
 // }
 }
 
-extension PfeMapKeyDataTypeX<K> on MapKeyDataType<K> {
-  ScalarAttribute<MshMapEntryKeyMsg, K> get mapEntryKeyMsgAttribute {
-    final MapKeyDataType self = this;
-    final ScalarAttribute<MshMapEntryKeyMsg, dynamic> result = switch (self) {
-      StringDataType() => MshMapEntryKeyMsg$.stringKey.hack,
-      CoreIntDataType() => MshMapEntryKeyMsg$.intKey.hack,
-      final other => throw other,
-    };
-
-    return result as ScalarAttribute<MshMapEntryKeyMsg, K>;
-  }
-}
+// extension PfeMapKeyDataTypeX<K> on MapKeyDataType<K> {
+//   ScalarAttribute<MshMapEntryKeyMsg, K> get mapEntryKeyMsgAttribute {
+//     final MapKeyDataType self = this;
+//     final ScalarAttribute<MshMapEntryKeyMsg, dynamic> result = switch (self) {
+//       StringDataType() => MshMapEntryKeyMsg$.stringKey.hack,
+//       CoreIntDataType() => MshMapEntryKeyMsg$.intKey.hack,
+//       final other => throw other,
+//     };
+//
+//     return result as ScalarAttribute<MshMapEntryKeyMsg, K>;
+//   }
+// }
 
 extension _Hack on ScalarAttribute<MshMapEntryKeyMsg, dynamic> {
   ScalarAttribute<MshMapEntryKeyMsg, dynamic> get hack => this;

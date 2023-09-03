@@ -56,6 +56,7 @@ ShaftLayout renderShaft({
           ...shaftObj.shaftActions.callShaftContent().call(rectCtx),
         ],
         themeWrap: themeWrap,
+        dividerThickness: themeWrap.shaftSharingDividerThickness,
       );
     },
   ).wxBackgroundColor(

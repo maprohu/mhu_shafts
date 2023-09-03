@@ -13,7 +13,7 @@ import 'package:mhu_shafts/src/wx/wx.dart';
 import 'package:protobuf/protobuf.dart';
 
 import 'proto.dart' as $lib;
-// part 'proto.g.has.dart';
+part 'proto.g.has.dart';
 part 'proto.g.dart';
 
 part 'message.dart';

@@ -40,6 +40,14 @@ TextCtx defaultTextCtx({
   );
 }
 
+MonoTextCtx defaultMonoTextCtx({
+  @ext required RectCtx rectCtx,
+}) {
+  return rectCtx.createMonoTextCtx(
+    monoTextStyle: rectCtx.renderCtxThemeWrap().defaultMonoTextStyle,
+  );
+}
+
 Wx wxTextAlign({
   @Ext() required TextCtx textCtx,
   required String text,

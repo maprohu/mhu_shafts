@@ -11,6 +11,7 @@ class SampleProtoShaftFactory extends SampleShaftFactory {
 
     late final shaftInterface = ComposedProtoMessageShaftInterface(
       messageCtx: messageCtx,
+      msgScalarValue: scalarValue,
     );
     return ComposedShaftActions.shaftLabel(
       shaftLabel: stringConstantShaftLabel("Sample Proto"),

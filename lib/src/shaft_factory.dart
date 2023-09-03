@@ -28,6 +28,8 @@ part 'shaft_factory/focus.dart';
 part 'shaft_factory/menu.dart';
 
 part 'shaft_factory/identifier.dart';
+part 'shaft_factory/todo.dart';
+
 
 typedef ShaftFactoryKey = int;
 
@@ -64,8 +66,12 @@ abstract class ShaftLabel
     implements HasCallShaftHeaderLabel, HasCallShaftOpenerLabel {}
 
 @Compose()
+abstract class ShaftDirectFocusContentActions
+    implements HasShaftFocusHandler, HasShaftContent {}
+
+@Compose()
 abstract class ShaftDirectContentActions
-    implements HasShaftFocusHandler, HasShaftContent, HasShaftInterface {}
+    implements ShaftDirectFocusContentActions, HasShaftInterface {}
 
 @Compose()
 abstract class ShaftContentActions
