@@ -205,7 +205,7 @@ SharingBox stringEditorSharingBoxFromGridSizeBuilder({
 }
 
 typedef FocusedStringEditorState = HasWatchValue<MshStringEditStateMsg?>;
-typedef FocusedStringEditorController = ScalarValue<MshStringEditStateMsg>;
+typedef FocusedStringEditorController = SingleValue<MshStringEditStateMsg>;
 
 SharingBox focusedStringEditorSharingBox<T>({
   required SizedShaftBuilderBits sizedBits,

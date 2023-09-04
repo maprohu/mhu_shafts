@@ -548,19 +548,12 @@ packages:
     source: path
     version: "1.0.1"
   mhu_dart_pbschema:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../mhu_dart_pbschema"
       relative: true
     source: path
     version: "1.0.2"
-  mhu_dart_proto:
-    dependency: "direct main"
-    description:
-      path: "../mhu_dart_proto"
-      relative: true
-    source: path
-    version: "1.0.3"
   mhu_dart_protoc:
     dependency: "direct overridden"
     description:

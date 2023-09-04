@@ -112,8 +112,8 @@ Iterable<ShaftCtx> shaftCtxLeftIterable({
 ShaftMsg? readShaftMsg({
   @extHas required ShaftObj shaftObj,
 }) {
-  return shaftObj.shaftCtx.windowObj.windowStateFw
-      .read()
+  return shaftObj.shaftCtx.windowObj.windowStateWatchVar
+      .readOrDefaultMessage()
       .getEffectiveTopShaft()
       .shaftMsgByIndexFromLeft(shaftObj.indexFromLeft);
 }

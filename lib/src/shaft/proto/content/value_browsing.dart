@@ -22,7 +22,7 @@ abstract class ValueBrowsingContent<T>
     implements ShaftContentBits, HasEditingBits<T> {
   static ValueBrowsingContent<T> concreteField<M extends GeneratedMessage, T>({
     required MessageUpdateBits<M> messageUpdateBits,
-    required ScalarValue<M> messageValue,
+    required SingleValue<M> messageValue,
     required FieldCoordinates fieldCoordinates,
     required DataType<T> dataType,
     required ProtoCustomizer protoCustomizer,
@@ -68,7 +68,7 @@ abstract class ValueBrowsingContent<T>
 
   static ValueBrowsingContent<T> scalar<T>({
     required ScalarDataType<T> scalarDataType,
-    required ScalarValue<T> scalarValue,
+    required SingleValue<T> scalarValue,
     BuildShaftContent extraContent = emptyContent,
     required ProtoCustomizer protoCustomizer,
     required ProtoPath protoPath,
@@ -81,7 +81,7 @@ abstract class ValueBrowsingContent<T>
     ) {
       final scalarEditingBits = ScalarEditingBits.create(
         scalarDataType: scalarDataType,
-        scalarValue: scalarValue as ScalarValue<V>,
+        scalarValue: scalarValue as SingleValue<V>,
         protoCustomizer: protoCustomizer,
         protoPath: protoPath,
       );
@@ -129,7 +129,7 @@ abstract class ValueBrowsingContent<T>
             return message<M>(
               messageEditingBits: MessageEditingBits.create<M>(
                 messageDataType: messageDataType,
-                scalarValue: scalarValue as ScalarValue<M>,
+                scalarValue: scalarValue as SingleValue<M>,
                 protoCustomizer: protoCustomizer,
                 protoPath: protoPath,
               ),

@@ -17,9 +17,9 @@ part 'app.g.has.dart';
 class AppObj with MixAppCtx, MixDisposers {
   late final WindowCtx windowCtx;
 
-  late final themeWrapFr = disposers.fr(
+  late final themeWrapWatch = disposers.watching(
     () => appCtx.createThemeWrap(
-      themeMsg: appCtx.dataObj.themeFw(),
+      themeMsg: appCtx.dataObj.themeWatchVar.watchOrDefaultMessage(),
     ),
   );
 }

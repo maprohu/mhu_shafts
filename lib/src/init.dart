@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:isar/isar.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
-import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/shaft_factory.dart';
-
-import '../proto.dart';
 
 import 'screen/app.dart';
 
@@ -39,7 +36,6 @@ abstract class MhuShaftsConfig
 void initMhuShafts() {
   GoogleFonts.config.allowRuntimeFetching = false;
   WidgetsFlutterBinding.ensureInitialized();
-  mhuShaftsLib.register();
 }
 
 Widget mhuShaftsApp({

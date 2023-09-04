@@ -3,12 +3,9 @@ part of '../shaft.dart';
 Int64 nextShaftSequence({
   @extHas required DataObj dataObj,
 }) {
-  final fv = dataObj.sequencesFw.shaftSeq;
-
-  final next = fv.value;
-
-  fv.update((v) => v + 1);
-
+  final fv = dataObj.sequencesWatchVar.shaftSeq;
+  final next = fv.value ?? Int64.ZERO;
+  fv.value = next + 1;
   return next;
 }
 
@@ -26,7 +23,7 @@ void openShaftMsg({
   required ShaftMsg shaftMsg,
 }) {
   shaftCtx.windowUpdateView(() {
-    shaftCtx.windowObj.windowStateFw.topShaft.value = shaftMsg
+    shaftCtx.windowObj.windowStateWatchVar.topShaft.value = shaftMsg
         .addShaftMsgParent(
           shaftCtx: shaftCtx,
         )
@@ -214,8 +211,8 @@ bool shaftIsInStack({
   @ext required ShaftCtx shaftCtx,
 }) {
   final shaftSeq = shaftCtx.shaftObj.shaftMsg.shaftSeq;
-  return shaftCtx.windowObj.windowStateFw
-      .read()
+  return shaftCtx.windowObj.windowStateWatchVar
+      .readOrDefaultMessage()
       .getEffectiveTopShaft()
       .shaftMsgIterableLeft()
       .any((s) => s.shaftSeq == shaftSeq);
@@ -235,7 +232,8 @@ VoidCallback? shaftCloseAction({
   return () {
     assert(shaftCtx.shaftIsInStack());
     shaftCtx.windowUpdateView(() {
-      shaftCtx.windowObj.windowStateFw.topShaft.value = shaftOnLeft.shaftMsg;
+      shaftCtx.windowObj.windowStateWatchVar.topShaft.value =
+          shaftOnLeft.shaftMsg;
     });
   };
 }

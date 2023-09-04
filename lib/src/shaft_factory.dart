@@ -1,9 +1,7 @@
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
-import 'package:mhu_dart_proto/mhu_dart_proto.dart';
 import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/proto.dart';
-import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
 import 'package:mhu_shafts/src/shaft/error.dart';
 import 'package:mhu_shafts/src/shaft/main_menu.dart';

@@ -1,16 +1,24 @@
 part of 'main.dart';
 
 @Has()
-typedef SampleFw = Fw<SmpSampleMsg>;
+typedef SampleWatch = WatchProto<SmpSampleMsg>;
 
 @Compose()
-abstract class SampleConfigObj implements HasSchemaLookupByName, HasSampleFw {}
+abstract class SampleConfigObj
+    implements HasSchemaLookupByName, HasSampleWatch {}
 
 Future<SampleConfigObj> createSampleConfigObj(AppCtx appCtx) async {
   return ComposedSampleConfigObj(
-    schemaLookupByName: await mhuShaftsExampleLib.fileDescriptorSet
-        .descriptorSchemaLookupByName(),
-    sampleFw: fw(SmpSampleMsg()..freeze()),
+    schemaLookupByName: await mhuShaftsExamplePbschema
+        .pbschemaFileDescriptorSet()
+        .descriptorSchemaLookupByName(
+      dependencies: [],
+    ),
+    sampleWatch: watchVar(
+      SmpSampleMsg()..freeze(),
+    ).watchWriteMessage(
+      getDefault: SmpSampleMsg.getDefault,
+    ),
   );
 }
 

@@ -151,7 +151,7 @@ ShaftDirectFocusContentActions
 }) {
   return ComposedShaftDirectFocusContentActions(
     shaftContent: (rectCtx) sync* {
-      final msg = protoFieldShaftInterface.msgScalarValue.watchValue();
+      final msg = protoFieldShaftInterface.messageValue.watchValue();
       if (msg == null) {
         yield rectCtx.rectMessageSharingBox(
           message: "Msg does not exist.",

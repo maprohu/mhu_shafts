@@ -2,8 +2,8 @@ import 'package:isar/isar.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_commons/isar.dart';
+import 'package:mhu_dart_pbschema/mhu_dart_pbschema.dart';
 import 'package:mhu_shafts/proto.dart';
-import 'package:mhu_dart_proto/mhu_dart_proto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:protobuf/protobuf.dart';
 
@@ -50,15 +50,15 @@ Future<PersistCtx> createPersistCtx({
   );
 }
 
-typedef MshIsarSingletonFwFactory<M>
-    = IsarSingletonFwFactory<M, MshSingletonRecord>;
+typedef MshIsarSingletonWatchFactory<M extends Object>
+    = IsarSingletonWatchFactory<M, MshSingletonRecord>;
 
-MshIsarSingletonFwFactory<M>
-    mshIsarSingletonFwFactory<M extends GeneratedMessage>({
+MshIsarSingletonWatchFactory<M>
+    mshIsarSingletonWatchFactory<M extends GeneratedMessage>({
   @Ext() required CreateValue<M> createValue,
   DefaultValue? defaultValue,
 }) {
-  return createIsarSingletonProtoWriteOnlyFwFactory(
+  return createIsarSingletonProtoWriteOnlyWatchFactory(
     createValue: createValue,
     createRecord: MshSingletonRecord.new,
     defaultValue: defaultValue,
@@ -66,77 +66,77 @@ MshIsarSingletonFwFactory<M>
 }
 
 @Compose()
-abstract class MshWindowStateIsarSingletonFwFactory
-    implements MshIsarSingletonFwFactory<MshWindowStateMsg> {
+abstract class MshWindowStateIsarSingletonWatchFactory
+    implements MshIsarSingletonWatchFactory<MshWindowStateMsg> {
   static final instance =
-      ComposedMshWindowStateIsarSingletonFwFactory.isarSingletonFwFactory(
-    isarSingletonFwFactory: MshWindowStateMsg.new.mshIsarSingletonFwFactory(),
+      ComposedMshWindowStateIsarSingletonWatchFactory.isarSingletonWatchFactory(
+    isarSingletonWatchFactory: MshWindowStateMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
 @Compose()
-abstract class MshThemeIsarSingletonFwFactory
-    implements MshIsarSingletonFwFactory<MshThemeMsg> {
+abstract class MshThemeIsarSingletonWatchFactory
+    implements MshIsarSingletonWatchFactory<MshThemeMsg> {
   static final instance =
-      ComposedMshThemeIsarSingletonFwFactory.isarSingletonFwFactory(
-    isarSingletonFwFactory: MshThemeMsg.new.mshIsarSingletonFwFactory(),
+      ComposedMshThemeIsarSingletonWatchFactory.isarSingletonWatchFactory(
+    isarSingletonWatchFactory: MshThemeMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
 @Compose()
-abstract class MshShaftNotificationsIsarSingletonFwFactory
-    implements MshIsarSingletonFwFactory<MshShaftNotificationsMsg> {
-  static final instance = ComposedMshShaftNotificationsIsarSingletonFwFactory
-      .isarSingletonFwFactory(
-    isarSingletonFwFactory:
-        MshShaftNotificationsMsg.new.mshIsarSingletonFwFactory(),
+abstract class MshShaftNotificationsIsarSingletonWatchFactory
+    implements MshIsarSingletonWatchFactory<MshShaftNotificationsMsg> {
+  static final instance = ComposedMshShaftNotificationsIsarSingletonWatchFactory
+      .isarSingletonWatchFactory(
+    isarSingletonWatchFactory:
+        MshShaftNotificationsMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
 @Compose()
-abstract class MshSequencesIsarSingletonFwFactory
-    implements MshIsarSingletonFwFactory<MshSequencesMsg> {
+abstract class MshSequencesIsarSingletonWatchFactory
+    implements MshIsarSingletonWatchFactory<MshSequencesMsg> {
   static final instance =
-      ComposedMshSequencesIsarSingletonFwFactory.isarSingletonFwFactory(
-    isarSingletonFwFactory: MshSequencesMsg.new.mshIsarSingletonFwFactory(),
+      ComposedMshSequencesIsarSingletonWatchFactory.isarSingletonWatchFactory(
+    isarSingletonWatchFactory: MshSequencesMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
-final isarSingletonFwFactories =
-    createIsarSingletonFwFactories<Msg, MshSingletonRecord>({
-  1: MshWindowStateIsarSingletonFwFactory.instance,
-  2: MshThemeIsarSingletonFwFactory.instance,
-  3: MshShaftNotificationsIsarSingletonFwFactory.instance,
-  4: MshSequencesIsarSingletonFwFactory.instance,
+final isarSingletonWatchFactories =
+    createIsarSingletonWatchFactories<Msg, MshSingletonRecord>({
+  1: MshWindowStateIsarSingletonWatchFactory.instance,
+  2: MshThemeIsarSingletonWatchFactory.instance,
+  3: MshShaftNotificationsIsarSingletonWatchFactory.instance,
+  4: MshSequencesIsarSingletonWatchFactory.instance,
 });
 
 class PersistObjSingletonFactoryMarker<M extends Msg,
-    F extends MshIsarSingletonFwFactory<M>> {
+    F extends MshIsarSingletonWatchFactory<M>> {
   late final F factory;
 }
 
-// PersistObjSingletonFactoryMarker<M, F> markPersistObjSingletonFactory<M extends Msg, F extends IsarSingletonFwFactory<M>>({
+// PersistObjSingletonFactoryMarker<M, F> markPersistObjSingletonFactory<M extends Msg, F extends IsarSingletonWatchFactory<M>>({
 //
 //
 // })
 
-// Future<Fw<M>> createPersistObjSingletonFw<M extends Msg,
-//     F extends IsarSingletonFwFactory<M>>({
+// Future<Watch<M>> createPersistObjSingletonWatch<M extends Msg,
+//     F extends IsarSingletonWatchFactory<M>>({
 //   required PersistObj persistObj,
 // }) {
-//   return isarSingletonFwFactories
+//   return isarSingletonWatchFactories
 //       .lookupSingletonByType<F>()
-//       .produceIsarSingletonFw(
+//       .produceIsarSingletonWatch(
 //         isar: persistObj.isar,
 //         disposers: persistObj.flushDisposers,
 //       );
 // }
 
-Future<Fw<M>> mshProducePersistObjSingletonFw<M extends Msg>({
-  @ext required MshIsarSingletonFwFactory<M> isarSingletonFwFactory,
+Future<WatchProto<M>> mshProducePersistObjSingletonWatch<M extends Msg>({
+  @ext required MshIsarSingletonWatchFactory<M> isarSingletonWatchFactory,
   required PersistObj persistObj,
 }) {
-  return isarSingletonFwFactory.produceIsarSingletonFw(
+  return isarSingletonWatchFactory.produceIsarSingletonWatch(
     isarSingletonCollection: persistObj.isar.mshSingletonRecords,
     disposers: persistObj.flushDisposers,
   );

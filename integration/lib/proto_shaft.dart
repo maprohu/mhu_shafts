@@ -4,20 +4,19 @@ class SampleProtoShaftFactory extends SampleShaftFactory {
   @override
   ShaftActions buildShaftActions(ShaftCtx shaftCtx) {
     final sampleObj = shaftCtx.sampleConfigObj();
-    final sampleFw = sampleObj.sampleFw;
-    final scalarValue = sampleFw.toScalarValue;
+    final sampleWatch = sampleObj.sampleWatch;
     final messageCtx =
         sampleObj.schemaLookupByName.lookupMessageCtxOfType<SmpSampleMsg>();
 
     late final shaftInterface = ComposedProtoMessageShaftInterface(
       messageCtx: messageCtx,
-      msgScalarValue: scalarValue,
+      messageValue: sampleWatch,
     );
     return ComposedShaftActions.shaftLabel(
       shaftLabel: stringConstantShaftLabel("Sample Proto"),
       callShaftContent: () => protoMessageShaftContent(
         messageCtx: messageCtx,
-        scalarValue: scalarValue,
+        messageValue: sampleWatch,
       ),
       callShaftFocusHandler: shaftWithoutFocus,
       callShaftInterface: () => shaftInterface,

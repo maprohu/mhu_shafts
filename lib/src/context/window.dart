@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
+import 'package:mhu_shafts/proto.dart';
 import 'package:mhu_shafts/src/context/config.dart';
 export 'package:mhu_shafts/src/context/config.dart';
 import 'package:mhu_shafts/src/context/shaft.dart';
 import 'package:mhu_shafts/src/model.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
+import 'package:protobuf/protobuf.dart';
 export 'package:mhu_shafts/src/context/app.dart';
 
 import 'window.dart' as $lib;
@@ -18,26 +20,26 @@ part 'window.freezed.dart';
 
 @Has()
 class WindowObj with MixDisposers, MixWindowCtx {
-  late final Fr<Size> screenSizeFr;
+  late final WatchRead<Size> screenSizeWatch;
 
-  late final renderedViewFr = disposers.fr(
+  late final renderedViewWatch = disposers.watching(
     () => windowCtx.watchWindowRenderedView(),
   );
 
-  late final updateViewExecutor = renderedViewFr.createFrPausedExecutor();
+  late final updateViewExecutor = renderedViewWatch.runPaused;
 
   late final Fw<BeforeAfter<ShaftsLayout>> shaftsLayoutBeforeAfterFw =
       disposers.fw(
     (
-      before: renderedViewFr.read().shaftsLayout,
-      after: renderedViewFr.read().shaftsLayout,
+      before: renderedViewWatch.readValue().shaftsLayout,
+      after: renderedViewWatch.readValue().shaftsLayout,
     ),
   );
 
   late final onKeyEvent = this.windowOnKeyEvent();
 
   // for now only one window
-  late final windowStateFw = windowCtx.dataObj.windowStateFw;
+  late final windowStateWatchVar = windowCtx.dataObj.windowStateWatchVar;
 }
 
 @Compose()
@@ -50,7 +52,8 @@ Future<WindowCtx> createWindowCtx({
 }) async {
   final windowObj = WindowObj()
     ..disposers = disposers
-    ..screenSizeFr = await ScreenSizeObserver.stream(disposers).fr(disposers);
+    ..screenSizeWatch =
+        await ScreenSizeObserver.stream(disposers).streamWatchRead(disposers);
 
   final windowCtx = ComposedWindowCtx.configCtx(
     configCtx: configCtx,
@@ -83,7 +86,7 @@ RenderedView watchWindowRenderedView({
 void startWindowRenderStream({
   @extHas required WindowObj windowObj,
 }) {
-  windowObj.renderedViewFr.changes().forEach(
+  windowObj.renderedViewWatch.distinctValues().forEach(
     (renderedView) {
       windowObj.shaftsLayoutBeforeAfterFw.value = (
         before: windowObj.shaftsLayoutBeforeAfterFw.read().after,
@@ -97,7 +100,7 @@ OnKeyEvent windowOnKeyEvent({
   @extHas required WindowObj windowObj,
 }) {
   return (keyEvent) {
-    windowObj.renderedViewFr.read().onKeyEvent(keyEvent);
+    windowObj.renderedViewWatch.readValue().onKeyEvent(keyEvent);
   };
 }
 
@@ -112,6 +115,7 @@ void windowResetView({
   @extHas required WindowObj windowObj,
 }) {
   windowObj.windowUpdateView(() {
-    windowObj.windowStateFw.topShaft.value = createDefaultShaftMsg();
+    windowObj.windowStateWatchVar.topShaft.value = createDefaultShaftMsg();
   });
 }
+

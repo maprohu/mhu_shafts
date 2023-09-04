@@ -23,14 +23,14 @@ part 'render/aim.dart';
 
 @Has()
 class RenderObj with MixRenderCtx {
-  late final windowStateMsg = renderCtx.dataObj.windowStateFw.watch();
+  late final windowStateMsg = renderCtx.dataObj.windowStateWatchVar.watchOrDefaultMessage();
 
-  late final themeWrap = renderCtx.appObj.themeWrapFr.watch();
+  late final themeWrap = renderCtx.appObj.themeWrapWatch();
   late final themeMsg = themeWrap.themeMsg;
 
-  late final controlWrap = renderCtx.dataObj.controlWrapFr.watch();
+  late final controlWrap = renderCtx.dataObj.controlWrapWatch();
 
-  late final screenSize = renderCtx.windowObj.screenSizeFr.watch();
+  late final screenSize = renderCtx.windowObj.screenSizeWatch();
   late final screenHeight = screenSize.height;
   late final screenWidthPixels = screenSize.width;
 

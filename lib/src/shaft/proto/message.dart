@@ -1,18 +1,15 @@
 part of 'proto.dart';
 
-@Has()
-typedef MsgScalarValue<M extends Msg> = ScalarValue<M>;
-
 @Compose()
 abstract class ProtoMessageShaftInterface
-    implements HasMessageCtx, HasMsgScalarValue {}
+    implements HasMessageCtx, HasMessageValue {}
 
 ShaftContent protoMessageShaftContent<M extends Msg>({
   @ext required MessageCtx messageCtx,
-  @ext required ScalarValue<M> scalarValue,
+  @ext required MessageValue<M> messageValue,
 }) {
   return (rectCtx) {
-    final msg = scalarValue.watchValue();
+    final msg = messageValue.watchValue();
     final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
       return rectCtx.rectMessageSharingBoxes(
