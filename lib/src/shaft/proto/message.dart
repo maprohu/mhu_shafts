@@ -1,15 +1,14 @@
 part of 'proto.dart';
 
 @Compose()
-abstract class ProtoMessageShaftInterface
-    implements HasMessageCtx, HasMessageValue {}
+abstract class ProtoMessageShaftInterface<M extends Msg>
+    implements HasMessageCtx, HasMessageValue<M>, HasProtoCustomizer {}
 
 ShaftContent protoMessageShaftContent<M extends Msg>({
-  @ext required MessageCtx messageCtx,
-  @ext required MessageValue<M> messageValue,
+  @ext required ProtoMessageShaftInterface<M> shaftInterface,
 }) {
   return (rectCtx) {
-    final msg = messageValue.watchValue();
+    final msg = shaftInterface.messageValue.watchValue();
     final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
       return rectCtx.rectMessageSharingBoxes(
@@ -20,7 +19,7 @@ ShaftContent protoMessageShaftContent<M extends Msg>({
       rectCtx.chunkedListRectVerticalSharingBox(
         itemHeight: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
         items: protoMessageFieldWxRectBuilders(
-          messageCtx: messageCtx,
+          shaftInterface: shaftInterface,
           msg: msg,
         ).toList(),
       ),
@@ -29,13 +28,23 @@ ShaftContent protoMessageShaftContent<M extends Msg>({
 }
 
 Iterable<WxRectBuilder> protoMessageFieldWxRectBuilders<M extends Msg>({
-  required MessageCtx messageCtx,
+  required ProtoMessageShaftInterface<M> shaftInterface,
   required M msg,
 }) sync* {
-  for (final logicalFieldCtx in messageCtx.callLogicalFieldsList()) {
+  for (final logicalFieldCtx
+      in shaftInterface.messageCtx.callLogicalFieldsList()) {
+    final isVisible = shaftInterface.protoCustomizer.logicalFieldVisible.call(
+      logicalFieldCtx.callLogicalFieldMarker(),
+      shaftInterface,
+    );
+
+    if (!isVisible) {
+      continue;
+    }
+
     switch (logicalFieldCtx) {
       case FieldCtx():
-        yield protoMessageFieldWxRectBuilder(
+        yield shaftOpenerPreviewWxRectBuilder(
           shaftOpener:
               mshShaftFactories.factoriesShaftOpenerOf<ProtoFieldShaftFactory>(
             identifierAnyData: MshShaftIdentifierMsg_Field$.create(
@@ -50,64 +59,6 @@ Iterable<WxRectBuilder> protoMessageFieldWxRectBuilders<M extends Msg>({
   }
 }
 
-WxRectBuilder protoMessageFieldWxRectBuilder({
-  required ShaftOpener shaftOpener,
-  required String label,
-  required String value,
-}) {
-  return (rectCtx) {
-    final themeWrap = rectCtx.renderCtxThemeWrap();
-    return wxRectPaddingSizer(
-      rectCtx: rectCtx,
-      paddingSizer: themeWrap.protoFieldPaddingSizer,
-      builder: (rectCtx) {
-        final labelCtx = rectCtx.rectWithHeight(
-          height: themeWrap.protoFieldLabelHeight,
-        );
-        final labelTextStyleWrap = themeWrap.protoFieldLabelTextStyleWrap;
-
-        final labelWx = labelCtx.wxRectFillRight(
-          left: [
-            rectCtx.wxRectAim(
-              action: shaftOpener.openShaftAction(
-                shaftCtx: rectCtx,
-              ),
-              horizontal: null,
-              vertical: AxisAlignment.center,
-            ),
-          ],
-          right: (rectCtx) {
-            return rectCtx
-                .createTextCtx(
-                  textStyleWrap: labelTextStyleWrap,
-                )
-                .wxTextAlign(
-                  text: label,
-                );
-          },
-        );
-
-        final valueWx = rectCtx
-            .createTextCtx(
-                textStyleWrap: themeWrap.protoFieldValueTextStyleWrap)
-            .wxTextHorizontal(text: value);
-
-        return rectCtx.wxRectColumnExact(
-          children: [
-            labelWx,
-            rectCtx
-                .rectWithHeight(height: themeWrap.protoFieldLabelValueGapHeight)
-                .wxEmpty(),
-            valueWx,
-          ],
-        );
-      },
-    ).wxDecorateShaftOpener(
-      shaftOpener: shaftOpener,
-      shaftCtx: rectCtx,
-    );
-  };
-}
 
 double calculateProtoMessageFieldItemInnerHeight({
   @ext required ThemeWrap themeWrap,

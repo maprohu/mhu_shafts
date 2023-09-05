@@ -4,10 +4,6 @@ part of 'proto.dart';
 abstract class ProtoFieldShaftInterface
     implements ProtoMessageShaftInterface, HasFieldCtx {}
 
-@Compose()
-abstract class ProtoScalarFieldShaftInterface<V extends Object>
-    implements ProtoFieldShaftInterface, HasScalarTypeActions<V> {}
-
 class ProtoFieldShaftFactory extends ShaftFactory {
   @override
   ShaftActions buildShaftActions(ShaftCtx shaftCtx) {
@@ -66,6 +62,12 @@ ShaftDirectContentActions protoFieldContentActions({
         ),
         shaftInterface: scalarInterface,
       );
+
+    case MapTypeActions():
+      return protoMapFieldContentActions(
+        protoFieldShaftInterface: protoFieldShaftInterface,
+        mapTypeActions: typeActions,
+      );
     default:
       return todoShaftDirectContentActions(
         message: typeActions,
@@ -74,102 +76,69 @@ ShaftDirectContentActions protoFieldContentActions({
   }
 }
 
-ProtoScalarFieldShaftInterface<V>
-    protoScalarFieldShaftInterface<V extends Object>({
+SharingBoxes rectCtxNullableMsgSharingBoxes<V>({
+  @ext required RectCtx rectCtx,
   required ProtoFieldShaftInterface protoFieldShaftInterface,
-  required ScalarTypeActions<V> scalarTypeActions,
-}) {
-  return ComposedProtoScalarFieldShaftInterface<V>.protoFieldShaftInterface(
-    protoFieldShaftInterface: protoFieldShaftInterface,
-    scalarTypeActions: scalarTypeActions,
-  );
-}
-
-ShaftDirectFocusContentActions scalarProtoFieldFocusContentActions({
-  required ProtoFieldShaftInterface protoFieldShaftInterface,
-  required ScalarTypeActions scalarTypeActions,
-}) {
-  final scalarTypeEnm = scalarTypeActions.scalarTypeEnm;
-  switch (scalarTypeEnm) {
-    case ScalarTypes.TYPE_STRING:
-      return stringProtoFieldShaftContentActions(
-        scalarTypeActions: scalarTypeActions.castScalarTypeActions<String>(),
-        protoFieldShaftInterface: protoFieldShaftInterface,
-      );
-    case ScalarTypes.TYPE_INT32:
-    case ScalarTypes.TYPE_UINT32:
-    case ScalarTypes.TYPE_SINT32:
-    case ScalarTypes.TYPE_FIXED32:
-    case ScalarTypes.TYPE_SFIXED32:
-      return intProtoFieldShaftContentActions(
-        scalarTypeActions: scalarTypeActions.castScalarTypeActions<int>(),
-        protoFieldShaftInterface: protoFieldShaftInterface,
-      );
-    default:
-      return todoShaftDirectContentActions(
-        message: scalarTypeEnm,
-        stackTrace: StackTrace.current,
-      );
+  required TypeActions<V> typeActions,
+  required SharingBoxes Function(V value) builder,
+}) sync* {
+  final msg = protoFieldShaftInterface.messageValue.watchValue();
+  if (msg == null) {
+    yield rectCtx.rectMessageSharingBox(
+      message: "Msg is null.",
+    );
+    return;
   }
-}
 
-ShaftDirectFocusContentActions stringProtoFieldShaftContentActions({
-  required ProtoFieldShaftInterface protoFieldShaftInterface,
-  required ScalarTypeActions<String> scalarTypeActions,
-}) {
-  return nullableScalarProtoFieldShaftContentActions(
-    protoFieldShaftInterface: protoFieldShaftInterface,
-    scalarTypeActions: scalarTypeActions,
-    builder: (rectCtx, value) {
-      return rectCtx.defaultMonoTextCtx().monoTextCtxSharingBox(
-            string: value,
-          );
-    },
+  final value = typeActions.readFieldValue(
+    msg,
+    protoFieldShaftInterface.fieldCtx.callFieldCoordinates().fieldIndex,
   );
+
+  yield* builder(value);
 }
 
-ShaftDirectFocusContentActions intProtoFieldShaftContentActions({
+ShaftDirectFocusContentActions
+    nullableMsgProtoFieldShaftContentActions<V extends Object>({
   required ProtoFieldShaftInterface protoFieldShaftInterface,
-  required ScalarTypeActions<int> scalarTypeActions,
+  required TypeActions<V> typeActions,
+  required SharingBoxes Function(RectCtx rectCtx, V value) builder,
 }) {
-  return nullableScalarProtoFieldShaftContentActions(
-    protoFieldShaftInterface: protoFieldShaftInterface,
-    scalarTypeActions: scalarTypeActions,
-    builder: (rectCtx, value) {
-      return rectCtx.defaultMonoTextCtx().monoTextCtxSharingBox(
-            string: value.toString(),
-          );
+  return ComposedShaftDirectFocusContentActions(
+    shaftContent: (rectCtx) {
+      return rectCtx.rectCtxNullableMsgSharingBoxes(
+        protoFieldShaftInterface: protoFieldShaftInterface,
+        typeActions: typeActions,
+        builder: (value) sync* {
+          yield* builder(rectCtx, value);
+        },
+      );
     },
   );
 }
 
 ShaftDirectFocusContentActions
-    nullableScalarProtoFieldShaftContentActions<V extends Object>({
+    nullableMsgValueProtoFieldShaftContentActions<V extends Object>({
   required ProtoFieldShaftInterface protoFieldShaftInterface,
-  required ScalarTypeActions<V> scalarTypeActions,
-  required SharingBox Function(RectCtx rectCtx, V value) builder,
+  required TypeActions<V?> typeActions,
+  required SharingBoxes Function(RectCtx rectCtx, V value) builder,
 }) {
   return ComposedShaftDirectFocusContentActions(
-    shaftContent: (rectCtx) sync* {
-      final msg = protoFieldShaftInterface.messageValue.watchValue();
-      if (msg == null) {
-        yield rectCtx.rectMessageSharingBox(
-          message: "Msg does not exist.",
-        );
-        return;
-      }
-      final value = scalarTypeActions.readFieldValue(
-        msg,
-        protoFieldShaftInterface.fieldCtx.callFieldCoordinates().fieldIndex,
+    shaftContent: (rectCtx) {
+      return rectCtx.rectCtxNullableMsgSharingBoxes(
+        protoFieldShaftInterface: protoFieldShaftInterface,
+        typeActions: typeActions,
+        builder: (value) sync* {
+          if (value == null) {
+            yield rectCtx
+                .defaultTextCtx()
+                .wxTextHorizontal(text: "Value is null.")
+                .fixedVerticalSharingBox();
+          } else {
+            yield* builder(rectCtx, value);
+          }
+        },
       );
-      if (value == null) {
-        yield rectCtx
-            .defaultTextCtx()
-            .wxTextHorizontal(text: "Value is null.")
-            .fixedVerticalSharingBox();
-      } else {
-        yield builder(rectCtx, value);
-      }
     },
   );
 }

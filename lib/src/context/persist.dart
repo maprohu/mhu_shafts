@@ -136,6 +136,7 @@ Future<WatchProto<M>> mshProducePersistObjSingletonWatch<M extends Msg>({
   @ext required MshIsarSingletonWatchFactory<M> isarSingletonWatchFactory,
   required PersistObj persistObj,
 }) {
+  assert(M != Msg);
   return isarSingletonWatchFactory.produceIsarSingletonWatch(
     isarSingletonCollection: persistObj.isar.mshSingletonRecords,
     disposers: persistObj.flushDisposers,

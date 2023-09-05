@@ -237,3 +237,62 @@ VoidCallback? shaftCloseAction({
     });
   };
 }
+
+WxRectBuilder shaftOpenerPreviewWxRectBuilder({
+  required ShaftOpener shaftOpener,
+  required String label,
+  required String value,
+}) {
+  return (rectCtx) {
+    final themeWrap = rectCtx.renderCtxThemeWrap();
+    return wxRectPaddingSizer(
+      rectCtx: rectCtx,
+      paddingSizer: themeWrap.protoFieldPaddingSizer,
+      builder: (rectCtx) {
+        final labelCtx = rectCtx.rectWithHeight(
+          height: themeWrap.protoFieldLabelHeight,
+        );
+        final labelTextStyleWrap = themeWrap.protoFieldLabelTextStyleWrap;
+
+        final labelWx = labelCtx.wxRectFillRight(
+          left: [
+            rectCtx.wxRectAim(
+              action: shaftOpener.openShaftAction(
+                shaftCtx: rectCtx,
+              ),
+              horizontal: null,
+              vertical: AxisAlignment.center,
+            ),
+          ],
+          right: (rectCtx) {
+            return rectCtx
+                .createTextCtx(
+              textStyleWrap: labelTextStyleWrap,
+            )
+                .wxTextAlign(
+              text: label,
+            );
+          },
+        );
+
+        final valueWx = rectCtx
+            .createTextCtx(
+            textStyleWrap: themeWrap.protoFieldValueTextStyleWrap)
+            .wxTextHorizontal(text: value);
+
+        return rectCtx.wxRectColumnExact(
+          children: [
+            labelWx,
+            rectCtx
+                .rectWithHeight(height: themeWrap.protoFieldLabelValueGapHeight)
+                .wxEmpty(),
+            valueWx,
+          ],
+        );
+      },
+    ).wxDecorateShaftOpener(
+      shaftOpener: shaftOpener,
+      shaftCtx: rectCtx,
+    );
+  };
+}

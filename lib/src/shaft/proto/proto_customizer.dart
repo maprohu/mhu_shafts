@@ -1,23 +1,22 @@
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
+import 'package:mhu_dart_pbschema/mhu_dart_pbschema.dart';
+import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/src/bx/menu.dart';
 import 'package:mhu_shafts/src/proto.dart';
 import 'package:mhu_shafts/src/screen/calc.dart';
-import 'package:mhu_dart_proto/mhu_dart_proto.dart';
 import 'package:protobuf/protobuf.dart';
-
-import '../../builder/shaft.dart';
 
 part 'proto_customizer.g.dart';
 
 part 'proto_customizer.g.has.dart';
 
-// @Customizer()
-// typedef MapEntryFeature<O> = O Function<K, V>(
-//   MapFieldAccess<Msg, K, V> mapFieldAccess,
-//   MapEntry<K, V> mapEntry,
-// );
-//
+@Customizer()
+typedef LogicalFieldFeature<O> = O Function<M extends Msg>(
+  LogicalFieldMarker<M> logicalFieldMarker,
+  ProtoMessageShaftInterface<M> shaftInterface,
+);
+
 // @Customizer()
 // typedef MapKeyFeature = K? Function<K, V>(
 //   MapFieldAccess<Msg, K, V> mapFieldAccess,
@@ -38,26 +37,29 @@ part 'proto_customizer.g.has.dart';
 
 @Has()
 class ProtoCustomizer {
-  // late final mapEntryLabel = MapEntryFeatureCustomizer<String>(
-  //   <K, V>(mapFieldAccess, mapEntry) => mapEntry.key.toString(),
-  // );
-  //
-  // late final mapDefaultKey = MapKeyFeatureCustomizer(
-  //   <K, V>(mapFieldAccess) => null,
-  // );
-  //
-  // late final mapFieldOptions = MapFieldOptionsFeatureCustomizer(
-  //   <K, V>(mapFieldAccess, mapEditingBits, shaftBuilderBits) => null,
-  // );
-  //
-  // late final mapEntryExtraContent =
-  //     MapEntryFeatureCustomizer<BuildShaftContent>(
-  //   <K, V>(mapFieldAccess, mapEntry) => empty1,
-  // );
-  //
-  // late final messageEditOptions =
-  //     MessageValueFeatureCustomizer<BuildShaftOptions?>(
-  //   <M extends Msg>(instance, messageEditingBits) => null,
-  // );
-}
+  late final logicalFieldVisible = LogicalFieldFeatureCustomizer<bool>(
+    <M extends Msg>(logicalFieldMarker, shaftInterface) => true,
+  );
 
+// late final mapEntryLabel = MapEntryFeatureCustomizer<String>(
+//   <K, V>(mapFieldAccess, mapEntry) => mapEntry.key.toString(),
+// );
+//
+// late final mapDefaultKey = MapKeyFeatureCustomizer(
+//   <K, V>(mapFieldAccess) => null,
+// );
+//
+// late final mapFieldOptions = MapFieldOptionsFeatureCustomizer(
+//   <K, V>(mapFieldAccess, mapEditingBits, shaftBuilderBits) => null,
+// );
+//
+// late final mapEntryExtraContent =
+//     MapEntryFeatureCustomizer<BuildShaftContent>(
+//   <K, V>(mapFieldAccess, mapEntry) => empty1,
+// );
+//
+// late final messageEditOptions =
+//     MessageValueFeatureCustomizer<BuildShaftOptions?>(
+//   <M extends Msg>(instance, messageEditingBits) => null,
+// );
+}
