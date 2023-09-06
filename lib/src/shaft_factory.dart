@@ -65,7 +65,9 @@ abstract class ShaftLabel
 
 @Compose()
 abstract class ShaftDirectFocusContentActions
-    implements HasShaftFocusHandler, HasShaftContent {}
+    implements
+        // HasShaftFocusHandler,
+        HasShaftContent {}
 
 @Compose()
 abstract class ShaftDirectContentActions
@@ -74,7 +76,7 @@ abstract class ShaftDirectContentActions
 @Compose()
 abstract class ShaftContentActions
     implements
-        HasCallShaftFocusHandler,
+        // HasCallShaftFocusHandler,
         HasCallShaftContent,
         HasCallShaftInterface {}
 
@@ -169,7 +171,6 @@ ShaftContentActions callContentActions({
   late final contentActions = call();
 
   return ComposedShaftContentActions(
-    callShaftFocusHandler: () => contentActions.shaftFocusHandler,
     callShaftContent: () => contentActions.shaftContent,
     callShaftInterface: () => contentActions.shaftInterface,
   );

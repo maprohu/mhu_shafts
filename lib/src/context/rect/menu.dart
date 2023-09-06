@@ -131,6 +131,90 @@ MenuItem shaftOpenerMenuItem({
   );
 }
 
+MenuItem asyncShaftOpenerMenuItem({
+  @ext required AsyncShaftOpener asyncShaftOpener,
+  @ext required ShaftCtx shaftCtx,
+  required dynamic elementId,
+}) {
+  final shaftOpener = ComposedShaftOpener(
+    updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
+    updateShaftInnerState: (innerStateMsg) {},
+  );
+  final openedShaftCtx = createOpenedShaftCtx(
+    shaftOpener: shaftOpener,
+    shaftCtx: shaftCtx,
+  );
+  final shaftObj = openedShaftCtx.shaftObj;
+
+  final shaftElementId = shaftCtx.shaftCtxElementId(
+    elementId: elementId,
+  );
+
+  return menuItemStaticAction(
+    action: () {
+      final updateInnerStateOp = asyncShaftOpener.asyncUpdateShaftInnerState();
+      final release = shaftCtx.windowUpdateView(() {
+        return shaftCtx.shaftCtxRequestWindowFocus(
+          elementId: elementId,
+          handlePressedKey: (pressedKey, release) {
+            if (pressedKey == PressedKey.escape) {
+              shaftCtx.windowUpdateView(() {
+                updateInnerStateOp.cancel();
+                release();
+              });
+            }
+          },
+        );
+      });
+
+      updateInnerStateOp.value.then((updateInnerState) {
+        shaftCtx.windowUpdateView(() {
+          openShaftOpener(
+            shaftCtx: shaftCtx,
+            shaftOpener: ComposedShaftOpener(
+              updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
+              updateShaftInnerState: updateInnerState,
+            ),
+          );
+
+          release.releaseFocus();
+        });
+      });
+    },
+    wxRectBuilder: (rectCtx) {
+      return watchWidget(() {
+        final focused = shaftCtx.windowObj.focusedShaftVar()?.shaftElementId;
+
+        final labelBuilder = shaftObj.shaftActions.callShaftOpenerLabel();
+        if (shaftElementId == focused) {
+          return rectCtx.wxRectFillRight(
+            left: [
+              wxSizedBox(
+                widget: const CircularProgressIndicator(),
+                size: Size.square(
+                  shaftCtx
+                      .renderCtxThemeWrap()
+                      .menuItemPaddingSizer
+                      .innerHeight,
+                ),
+              ),
+            ],
+            right: labelBuilder,
+          ).widget;
+        } else {
+          return labelBuilder(rectCtx).widget;
+        }
+      }).createWx(size: rectCtx.size);
+    },
+    watchMenuItemSelected: () {
+      return isShaftOpen(
+        shaftOpener: shaftOpener,
+        shaftCtx: shaftCtx,
+      );
+    },
+  );
+}
+
 TextCtx menuItemText({
   @ext required RectCtx rectCtx,
 }) {

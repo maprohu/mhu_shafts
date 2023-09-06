@@ -11,14 +11,11 @@ class SampleProtoShaftFactory extends SampleShaftFactory {
     late final shaftInterface = ComposedProtoMessageShaftInterface(
       messageCtx: messageCtx,
       messageValue: sampleWatch,
+      protoCustomizer: ProtoCustomizer(),
     );
     return ComposedShaftActions.shaftLabel(
       shaftLabel: stringConstantShaftLabel("Sample Proto"),
-      callShaftContent: () => protoMessageShaftContent(
-        messageCtx: messageCtx,
-        messageValue: sampleWatch,
-      ),
-      callShaftFocusHandler: shaftWithoutFocus,
+      callShaftContent: () => shaftInterface.protoMessageShaftContent(),
       callShaftInterface: () => shaftInterface,
       callParseShaftIdentifier: keyOnlyShaftIdentifier,
     );

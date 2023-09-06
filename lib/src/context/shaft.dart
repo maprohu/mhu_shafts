@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:fixnum/fixnum.dart';
@@ -35,6 +36,9 @@ part 'shaft/header.dart';
 part 'shaft/open.dart';
 
 part 'shaft/text.dart';
+
+@Has()
+typedef ShaftSeq = Int64;
 
 @Has()
 class ShaftObj with MixShaftCtx, MixShaftMsg {
@@ -80,7 +84,6 @@ class ShaftObj with MixShaftCtx, MixShaftMsg {
 
   late final shaftIdentifierObj =
       shaftIdentifier.parseShaftIdentifier(shaftObj: this);
-
 }
 
 @Compose()
@@ -157,4 +160,10 @@ ShaftCtx shaftCtxOnLeft({
   @extHas required ShaftObj shaftObj,
 }) {
   return shaftObj.shaftOnLeft!.shaftCtx;
+}
+
+ShaftSeq shaftCtxShaftSeq({
+  @extHas required ShaftObj shaftObj,
+}) {
+  return shaftObj.shaftMsg.shaftSeq;
 }

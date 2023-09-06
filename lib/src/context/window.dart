@@ -1,13 +1,12 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_shafts/proto.dart';
-import 'package:mhu_shafts/src/context/config.dart';
 export 'package:mhu_shafts/src/context/config.dart';
-import 'package:mhu_shafts/src/context/shaft.dart';
-import 'package:mhu_shafts/src/model.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
-import 'package:protobuf/protobuf.dart';
+import 'package:mhu_shafts/src/context/rect.dart';
+import 'package:mhu_shafts/src/model.dart';
 export 'package:mhu_shafts/src/context/app.dart';
 
 import 'window.dart' as $lib;
@@ -17,6 +16,16 @@ part 'window.g.dart';
 part 'window.g.has.dart';
 
 part 'window.freezed.dart';
+
+typedef ShaftElementId = ({
+  ShaftSeq shaftSeq,
+  dynamic elementId,
+});
+
+typedef FocusedShaftElement = ({
+  HandlePressedKey handlePressedKey,
+  ShaftElementId shaftElementId,
+});
 
 @Has()
 class WindowObj with MixDisposers, MixWindowCtx {
@@ -40,6 +49,8 @@ class WindowObj with MixDisposers, MixWindowCtx {
 
   // for now only one window
   late final windowStateWatchVar = windowCtx.dataObj.windowStateWatchVar;
+
+  final focusedShaftVar = watchVar<FocusedShaftElement?>(null);
 }
 
 @Compose()
@@ -119,3 +130,59 @@ void windowResetView({
   });
 }
 
+@Has()
+@Compose()
+typedef ReleaseFocus = VoidCallback;
+
+HasReleaseFocus shaftCtxRequestWindowFocus({
+  @ext required ShaftCtx shaftCtx,
+  required dynamic elementId,
+  required void Function(
+    PressedKey pressedKey,
+    ReleaseFocus release,
+  ) handlePressedKey,
+}) {
+  final focusedShaftVar = shaftCtx.windowObj.focusedShaftVar;
+
+  assert(
+    focusedShaftVar.readValue() == null,
+    'window already focused',
+  );
+
+  late final ReleaseFocus releaseFocus;
+
+  final FocusedShaftElement focusedShaft = (
+    handlePressedKey: (pressedKey) {
+      handlePressedKey(
+        pressedKey,
+        releaseFocus,
+      );
+    },
+    shaftElementId: shaftCtx.shaftCtxElementId(
+      elementId: elementId,
+    ),
+  );
+
+  focusedShaftVar.value = focusedShaft;
+
+  return ComposedReleaseFocus(
+    releaseFocus: releaseFocus = () {
+      assert(
+        focusedShaftVar.readValue() == focusedShaft,
+        'window focus mismatch',
+      );
+
+      focusedShaftVar.value = null;
+    },
+  );
+}
+
+ShaftElementId shaftCtxElementId({
+  @ext required ShaftCtx shaftCtx,
+  required dynamic elementId,
+}) {
+  return (
+    shaftSeq: shaftCtx.shaftCtxShaftSeq(),
+    elementId: elementId,
+  );
+}

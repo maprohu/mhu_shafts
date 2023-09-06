@@ -51,10 +51,13 @@ typedef UpdateShaftIdentifier = void Function(
   MshShaftIdentifierMsg shaftIdentifierMsg,
 );
 @Has()
-@HasDefault(shaftEmptyInnerState)
 typedef UpdateShaftInnerState = void Function(
   MshInnerStateMsg innerStateMsg,
 );
+
+@Has()
+typedef AsyncUpdateShaftInnerState
+    = Call<CancelableOperation<UpdateShaftInnerState>>;
 
 void shaftEmptyInnerState(MshInnerStateMsg innerStateMsg) {}
 
@@ -62,8 +65,13 @@ void shaftEmptyInnerState(MshInnerStateMsg innerStateMsg) {}
 abstract class ShaftOpener
     implements HasUpdateShaftIdentifier, HasUpdateShaftInnerState {}
 
+@Compose()
+abstract class AsyncShaftOpener
+    implements HasUpdateShaftIdentifier, HasAsyncUpdateShaftInnerState {}
+
+
 MshShaftIdentifierMsg openerShaftIdentifierMsg({
-  @ext required ShaftOpener shaftOpener,
+  @ext required HasUpdateShaftIdentifier shaftOpener,
 }) {
   return MshShaftIdentifierMsg().also(shaftOpener.updateShaftIdentifier)
     ..freeze();
@@ -144,6 +152,19 @@ ShaftOpener factoriesShaftOpenerOf<F extends ShaftFactory>({
     updateShaftInnerState: updateShaftInnerState,
   );
 }
+AsyncShaftOpener factoriesAsyncShaftOpenerOf<F extends ShaftFactory>({
+  @ext required ShaftFactories shaftFactories,
+  CmnAny? identifierAnyData,
+  required AsyncUpdateShaftInnerState updateShaftInnerState,
+}) {
+  assert(F != ShaftFactory);
+  return ComposedAsyncShaftOpener(
+    updateShaftIdentifier: shaftFactories.factoriesUpdateShaftIdentifier<F>(
+      identifierAnyData: identifierAnyData,
+    ),
+    asyncUpdateShaftInnerState: updateShaftInnerState,
+  );
+}
 
 ShaftOpener mshShaftOpenerOf<F extends ShaftFactory>({
   CmnAny? identifierAnyData,
@@ -163,6 +184,13 @@ ShaftOpener mshCustomShaftOpener({
     shaftOpener: shaftOpener,
   );
 }
+AsyncShaftOpener mshCustomAsyncShaftOpener({
+  @ext required AsyncShaftOpener shaftOpener,
+}) {
+  return mshShaftFactories.factoriesCustomAsyncShaftOpenerOf<CustomShaftFactory>(
+    shaftOpener: shaftOpener,
+  );
+}
 
 ShaftOpener factoriesCustomShaftOpenerOf<F extends ShaftFactory>({
   @ext required ShaftOpener shaftOpener,
@@ -173,6 +201,18 @@ ShaftOpener factoriesCustomShaftOpenerOf<F extends ShaftFactory>({
   return factoriesShaftOpenerOf<F>(
     shaftFactories: shaftFactories,
     updateShaftInnerState: shaftOpener.updateShaftInnerState,
+    identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
+  );
+}
+AsyncShaftOpener factoriesCustomAsyncShaftOpenerOf<F extends ShaftFactory>({
+  @ext required AsyncShaftOpener shaftOpener,
+  @ext required ShaftFactories shaftFactories,
+}) {
+  assert(F != ShaftFactory);
+  final customIdentifier = shaftOpener.openerShaftIdentifierMsg();
+  return factoriesAsyncShaftOpenerOf<F>(
+    shaftFactories: shaftFactories,
+    updateShaftInnerState: shaftOpener.asyncUpdateShaftInnerState,
     identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
   );
 }
@@ -267,17 +307,17 @@ WxRectBuilder shaftOpenerPreviewWxRectBuilder({
           right: (rectCtx) {
             return rectCtx
                 .createTextCtx(
-              textStyleWrap: labelTextStyleWrap,
-            )
+                  textStyleWrap: labelTextStyleWrap,
+                )
                 .wxTextAlign(
-              text: label,
-            );
+                  text: label,
+                );
           },
         );
 
         final valueWx = rectCtx
             .createTextCtx(
-            textStyleWrap: themeWrap.protoFieldValueTextStyleWrap)
+                textStyleWrap: themeWrap.protoFieldValueTextStyleWrap)
             .wxTextHorizontal(text: value);
 
         return rectCtx.wxRectColumnExact(

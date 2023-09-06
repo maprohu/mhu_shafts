@@ -29,3 +29,15 @@ ShaftOpener sampleShaftOpener<F extends SampleShaftFactory>({
       )
       .mshCustomShaftOpener();
 }
+AsyncShaftOpener sampleAsyncShaftOpener<F extends SampleShaftFactory>({
+  CmnAny? identifierAnyData,
+  required AsyncUpdateShaftInnerState updateShaftInnerState,
+}) {
+  assert(F != SampleShaftFactory);
+  return sampleShaftFactories
+      .factoriesAsyncShaftOpenerOf<F>(
+    identifierAnyData: identifierAnyData,
+    updateShaftInnerState: updateShaftInnerState,
+  )
+      .mshCustomAsyncShaftOpener();
+}

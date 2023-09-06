@@ -22,7 +22,6 @@ class OptionsShaftFactory extends ShaftFactory {
             ),
         ];
       }),
-      callShaftFocusHandler: shaftWithoutFocus,
       callShaftInterface: voidShaftInterface,
       callParseShaftIdentifier: keyOnlyShaftIdentifier,
     );

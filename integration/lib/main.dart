@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
@@ -22,6 +23,8 @@ part 'custom_shafts.dart';
 part 'proto_shaft.dart';
 
 part 'config.dart';
+
+part 'async.dart';
 
 
 void main() async {

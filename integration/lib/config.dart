@@ -9,9 +9,7 @@ abstract class SampleConfigObj
 
 Future<SampleConfigObj> createSampleConfigObj(AppCtx appCtx) async {
   return ComposedSampleConfigObj(
-    schemaLookupByName: await mhuShaftsExamplePbschema
-        .pbschemaFileDescriptorSet()
-        .descriptorSchemaLookupByName(
+    schemaLookupByName: await mhuShaftsExamplePbschema.pbschemaLookupByName(
       dependencies: [],
     ),
     sampleWatch: watchVar(
