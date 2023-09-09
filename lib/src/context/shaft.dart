@@ -1,27 +1,23 @@
 import 'dart:math';
 
 import 'package:async/async.dart';
-import 'package:collection/collection.dart';
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_model/mhu_dart_model.dart';
-import 'package:mhu_shafts/src/bx/screen.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/context/text.dart';
-import 'package:mhu_shafts/src/screen/calc.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
 import 'package:mhu_shafts/src/shaft/options.dart';
 import 'package:mhu_shafts/src/shaft_factory.dart';
-import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 import 'package:protobuf/protobuf.dart';
 export 'package:mhu_shafts/src/context/render.dart';
 
+import '../../io.dart';
 import '../../proto.dart';
-import '../bx/boxed.dart';
 import '../model.dart';
+import '../shaft.dart';
 import '../wx/wx.dart';
 import 'shaft.dart' as $lib;
 
@@ -76,14 +72,19 @@ class ShaftObj with MixShaftCtx, MixShaftMsg {
   late final isVisible = screenWidthUnitsAvailableForShaft > 0;
 
   late final shaftIdentifier = shaftMsg.shaftIdentifier;
-  late final shaftFactoryKey = shaftIdentifier.shaftFactoryKey;
+  late final shaftFactoryKeyPath = shaftIdentifier.shaftFactoryKeyPath;
 
   late final shaftActions = mshLookupKeyShaftFactory(
-    shaftFactoryKey: shaftFactoryKey,
+    shaftFactoryKey: shaftFactoryKeyPath.first,
   ).buildShaftActions(shaftCtx);
 
   late final shaftIdentifierObj =
       shaftIdentifier.parseShaftIdentifier(shaftObj: this);
+
+  late final ephemeralData =
+      shaftCtx.windowObj.shaftEphemeralStore.getOrThrow(
+    this.shaftCtxShaftSeq(),
+  ).data;
 }
 
 @Compose()
@@ -108,7 +109,15 @@ Iterable<ShaftCtx> shaftCtxLeftIterable({
   @extHas required ShaftCtx shaftCtx,
 }) {
   return shaftCtx.finiteIterable(
-    (item) => item.shaftObj.shaftOnLeft?.shaftCtx,
+        (item) => item.shaftObj.shaftOnLeft?.shaftCtx,
+  );
+}
+
+Iterable<ShaftCtx> shaftCtxRightIterable({
+  @extHas required ShaftCtx shaftCtx,
+}) {
+  return shaftCtx.finiteIterable(
+    (item) => item.shaftObj.shaftOnRight?.shaftCtx,
   );
 }
 
@@ -150,11 +159,11 @@ ShaftIdentifierObj parseShaftIdentifier({
       .call(shaftIdentifierMsg);
 }
 
-ShaftIdentifierMsg shaftCtxInnerIdentifierMsg({
-  @extHas required ShaftObj shaftObj,
-}) {
-  return shaftObj.shaftIdentifier.innerShaftIdentifierMsg();
-}
+// ShaftIdentifierMsg shaftCtxInnerIdentifierMsg({
+//   @extHas required ShaftObj shaftObj,
+// }) {
+//   return shaftObj.shaftIdentifier.innerShaftIdentifierMsg();
+// }
 
 ShaftCtx shaftCtxOnLeft({
   @extHas required ShaftObj shaftObj,

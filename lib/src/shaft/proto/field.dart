@@ -8,7 +8,7 @@ class ProtoFieldShaftFactory extends ShaftFactory {
   @override
   ShaftActions buildShaftActions(ShaftCtx shaftCtx) {
     late final parse =
-        MshShaftIdentifierMsg_Field.create.parseShaftIdentifierOf();
+        MshShaftIdentifierMsg_Field.create.msgShaftIdentifierOf();
 
     late final ProtoMessageShaftInterface messageInterface =
         shaftCtx.shaftCtxOnLeft().shaftCtxInterface();
@@ -29,7 +29,7 @@ class ProtoFieldShaftFactory extends ShaftFactory {
 
     return ComposedShaftActions.merge$(
       callParseShaftIdentifier: () => parse,
-      shaftLabel: stingCallShaftLabel(
+      shaftLabel: stringCallShaftLabel(
         () => fieldCtx.fieldProtoName,
       ),
       shaftContentActions: callContentActions(
@@ -84,8 +84,8 @@ SharingBoxes rectCtxNullableMsgSharingBoxes<V>({
 }) sync* {
   final msg = protoFieldShaftInterface.messageValue.watchValue();
   if (msg == null) {
-    yield rectCtx.rectMessageSharingBox(
-      message: "Msg is null.",
+    yield rectCtx.rectMonoTextSharingBox(
+      text: "Msg is null.",
     );
     return;
   }

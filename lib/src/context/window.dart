@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
+import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/proto.dart';
 export 'package:mhu_shafts/src/context/config.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
@@ -27,6 +28,8 @@ typedef FocusedShaftElement = ({
   ShaftElementId shaftElementId,
 });
 
+typedef ShaftEphemeralRecord = DisposableRecord<ShaftEphemeralData>;
+
 @Has()
 class WindowObj with MixDisposers, MixWindowCtx {
   late final WatchRead<Size> screenSizeWatch;
@@ -51,6 +54,8 @@ class WindowObj with MixDisposers, MixWindowCtx {
   late final windowStateWatchVar = windowCtx.dataObj.windowStateWatchVar;
 
   final focusedShaftVar = watchVar<FocusedShaftElement?>(null);
+
+  final shaftEphemeralStore = <ShaftSeq, ShaftEphemeralRecord>{};
 }
 
 @Compose()
@@ -70,6 +75,43 @@ Future<WindowCtx> createWindowCtx({
     configCtx: configCtx,
     windowObj: windowObj,
   )..initMixWindowCtx(windowObj);
+
+
+  final loaders = await DspReg.perform((disposers) {
+    return disposers.watching(() {
+      final result = <AsyncCall>[];
+      final shafts = windowCtx
+          .createRenderCtx()
+          .renderObj
+          .shaftOnRightEnd
+          .shaftCtxLeftIterable()
+          .toList()
+          .reversed;
+
+      for (final shaft in shafts) {
+        final loadEphemeral =
+            shaft.shaftObj.shaftActions.callLoadShaftEphemeralData();
+
+        if (loadEphemeral != null) {
+          final disposers = DspImpl();
+          final loading = loadEphemeral(disposers).value;
+          final call = () async {
+            windowObj.shaftEphemeralStore[shaft.shaftCtxShaftSeq()] = (
+              disposers: disposers,
+              data: await loading,
+            );
+          };
+          result.add(call);
+        }
+      }
+
+      return result;
+    }).readValue();
+  });
+
+  for (final loader in loaders) {
+    await loader();
+  }
 
   windowObj.startWindowRenderStream();
 

@@ -4,7 +4,7 @@ Int64 nextShaftSequence({
   @extHas required DataObj dataObj,
 }) {
   final fv = dataObj.sequencesWatchVar.shaftSeq;
-  final next = fv.value ?? Int64.ZERO;
+  final next = fv.readValue() ?? Int64.ZERO;
   fv.value = next + 1;
   return next;
 }
@@ -21,14 +21,19 @@ ShaftMsg addShaftMsgParent({
 void openShaftMsg({
   @ext required ShaftCtx shaftCtx,
   required ShaftMsg shaftMsg,
+  required ShaftEphemeralRecord? shaftEphemeralRecord,
 }) {
   shaftCtx.windowUpdateView(() {
+    final shaftSeq = shaftCtx.nextShaftSequence();
+    if (shaftEphemeralRecord != null) {
+      shaftCtx.windowObj.shaftEphemeralStore[shaftSeq] = shaftEphemeralRecord;
+    }
     shaftCtx.windowObj.windowStateWatchVar.topShaft.value = shaftMsg
         .addShaftMsgParent(
           shaftCtx: shaftCtx,
         )
         .rebuild(
-          (msg) => msg.shaftSeq = shaftCtx.nextShaftSequence(),
+          (msg) => msg.shaftSeq = shaftSeq,
         );
   });
 }
@@ -50,25 +55,27 @@ ShaftCtx createOpenedShaftCtx({
 typedef UpdateShaftIdentifier = void Function(
   MshShaftIdentifierMsg shaftIdentifierMsg,
 );
-@Has()
-typedef UpdateShaftInnerState = void Function(
-  MshInnerStateMsg innerStateMsg,
-);
+// @Has()
+// typedef UpdateShaftInnerState = void Function(
+//   MshInnerStateMsg innerStateMsg,
+// );
 
-@Has()
-typedef AsyncUpdateShaftInnerState
-    = Call<CancelableOperation<UpdateShaftInnerState>>;
+// @Has()
+// typedef AsyncUpdateShaftInnerState
+//     = Call<CancelableOperation<UpdateShaftInnerState>>;
 
 void shaftEmptyInnerState(MshInnerStateMsg innerStateMsg) {}
 
 @Compose()
 abstract class ShaftOpener
-    implements HasUpdateShaftIdentifier, HasUpdateShaftInnerState {}
+    implements HasUpdateShaftIdentifier // , HasUpdateShaftInnerState
+{}
 
-@Compose()
-abstract class AsyncShaftOpener
-    implements HasUpdateShaftIdentifier, HasAsyncUpdateShaftInnerState {}
-
+// @Compose()
+// abstract class AsyncShaftOpener
+//     implements HasUpdateShaftIdentifier
+//     // , HasAsyncUpdateShaftInnerState
+// {}
 
 MshShaftIdentifierMsg openerShaftIdentifierMsg({
   @ext required HasUpdateShaftIdentifier shaftOpener,
@@ -125,14 +132,14 @@ Wx wxDecorateShaftOpener({
 
 UpdateShaftIdentifier factoriesUpdateShaftIdentifier<F extends ShaftFactory>({
   @ext required ShaftFactories shaftFactories,
-  CmnAny? identifierAnyData,
+  CmnAnyMsg? identifierAnyData,
 }) {
   assert(F != ShaftFactory);
   final shaftFactory = shaftFactories.shaftFactoriesLookupType<F>();
   final shaftFactoryKey = shaftFactory.getShaftFactoryKey();
 
   return (shaftIdentifierMsg) {
-    shaftIdentifierMsg.shaftFactoryKey = shaftFactoryKey;
+    shaftIdentifierMsg.shaftFactoryKeyPath.add(shaftFactoryKey);
     if (identifierAnyData != null) {
       shaftIdentifierMsg.anyData = identifierAnyData;
     }
@@ -141,39 +148,40 @@ UpdateShaftIdentifier factoriesUpdateShaftIdentifier<F extends ShaftFactory>({
 
 ShaftOpener factoriesShaftOpenerOf<F extends ShaftFactory>({
   @ext required ShaftFactories shaftFactories,
-  CmnAny? identifierAnyData,
-  UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
+  CmnAnyMsg? identifierAnyData,
+  // UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
 }) {
   assert(F != ShaftFactory);
   return ComposedShaftOpener(
     updateShaftIdentifier: shaftFactories.factoriesUpdateShaftIdentifier<F>(
       identifierAnyData: identifierAnyData,
     ),
-    updateShaftInnerState: updateShaftInnerState,
-  );
-}
-AsyncShaftOpener factoriesAsyncShaftOpenerOf<F extends ShaftFactory>({
-  @ext required ShaftFactories shaftFactories,
-  CmnAny? identifierAnyData,
-  required AsyncUpdateShaftInnerState updateShaftInnerState,
-}) {
-  assert(F != ShaftFactory);
-  return ComposedAsyncShaftOpener(
-    updateShaftIdentifier: shaftFactories.factoriesUpdateShaftIdentifier<F>(
-      identifierAnyData: identifierAnyData,
-    ),
-    asyncUpdateShaftInnerState: updateShaftInnerState,
+    // updateShaftInnerState: updateShaftInnerState,
   );
 }
 
+// AsyncShaftOpener factoriesAsyncShaftOpenerOf<F extends ShaftFactory>({
+//   @ext required ShaftFactories shaftFactories,
+//   CmnAny? identifierAnyData,
+//   required AsyncUpdateShaftInnerState updateShaftInnerState,
+// }) {
+//   assert(F != ShaftFactory);
+//   return ComposedAsyncShaftOpener(
+//     updateShaftIdentifier: shaftFactories.factoriesUpdateShaftIdentifier<F>(
+//       identifierAnyData: identifierAnyData,
+//     ),
+//     asyncUpdateShaftInnerState: updateShaftInnerState,
+//   );
+// }
+
 ShaftOpener mshShaftOpenerOf<F extends ShaftFactory>({
-  CmnAny? identifierAnyData,
-  UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
+  CmnAnyMsg? identifierAnyData,
+  // UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
 }) {
   assert(F != ShaftFactory);
   return mshShaftFactories.factoriesShaftOpenerOf<F>(
     identifierAnyData: identifierAnyData,
-    updateShaftInnerState: updateShaftInnerState,
+    // updateShaftInnerState: updateShaftInnerState,
   );
 }
 
@@ -184,45 +192,67 @@ ShaftOpener mshCustomShaftOpener({
     shaftOpener: shaftOpener,
   );
 }
-AsyncShaftOpener mshCustomAsyncShaftOpener({
-  @ext required AsyncShaftOpener shaftOpener,
+
+ShaftOpener mshIoShaftOpener({
+  @ext required ShaftOpener shaftOpener,
 }) {
-  return mshShaftFactories.factoriesCustomAsyncShaftOpenerOf<CustomShaftFactory>(
+  return mshShaftFactories.factoriesCustomShaftOpenerOf<IoShaftFactory>(
     shaftOpener: shaftOpener,
   );
 }
+
+// AsyncShaftOpener mshCustomAsyncShaftOpener({
+//   @ext required AsyncShaftOpener shaftOpener,
+// }) {
+//   return mshShaftFactories
+//       .factoriesCustomAsyncShaftOpenerOf<CustomShaftFactory>(
+//     shaftOpener: shaftOpener,
+//   );
+// }
 
 ShaftOpener factoriesCustomShaftOpenerOf<F extends ShaftFactory>({
   @ext required ShaftOpener shaftOpener,
   @ext required ShaftFactories shaftFactories,
 }) {
   assert(F != ShaftFactory);
-  final customIdentifier = shaftOpener.openerShaftIdentifierMsg();
-  return factoriesShaftOpenerOf<F>(
-    shaftFactories: shaftFactories,
-    updateShaftInnerState: shaftOpener.updateShaftInnerState,
-    identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
+  // final customIdentifier = shaftOpener.openerShaftIdentifierMsg();
+  final shaftFactory = shaftFactories.shaftFactoriesLookupType<F>();
+  final shaftFactoryKey = shaftFactory.getShaftFactoryKey();
+  return ComposedShaftOpener(
+    updateShaftIdentifier: (shaftIdentifierMsg) {
+      shaftOpener.updateShaftIdentifier(shaftIdentifierMsg);
+      shaftIdentifierMsg.shaftFactoryKeyPath.insert(
+        0,
+        shaftFactoryKey,
+      );
+    },
   );
+  // return factoriesShaftOpenerOf<F>(
+  //   shaftFactories: shaftFactories,
+  //   // updateShaftInnerState: shaftOpener.updateShaftInnerState,
+  //   identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
+  // );
 }
-AsyncShaftOpener factoriesCustomAsyncShaftOpenerOf<F extends ShaftFactory>({
-  @ext required AsyncShaftOpener shaftOpener,
-  @ext required ShaftFactories shaftFactories,
-}) {
-  assert(F != ShaftFactory);
-  final customIdentifier = shaftOpener.openerShaftIdentifierMsg();
-  return factoriesAsyncShaftOpenerOf<F>(
-    shaftFactories: shaftFactories,
-    updateShaftInnerState: shaftOpener.asyncUpdateShaftInnerState,
-    identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
-  );
-}
+
+// AsyncShaftOpener factoriesCustomAsyncShaftOpenerOf<F extends ShaftFactory>({
+//   @ext required AsyncShaftOpener shaftOpener,
+//   @ext required ShaftFactories shaftFactories,
+// }) {
+//   assert(F != ShaftFactory);
+//   final customIdentifier = shaftOpener.openerShaftIdentifierMsg();
+//   return factoriesAsyncShaftOpenerOf<F>(
+//     shaftFactories: shaftFactories,
+//     updateShaftInnerState: shaftOpener.asyncUpdateShaftInnerState,
+//     identifierAnyData: customIdentifier.writeToBuffer().cmnAnyFromBytes(),
+//   );
+// }
 
 ShaftMsg openerShaftMsg({
   @ext required ShaftOpener shaftOpener,
 }) {
   final shaftMsg = ShaftMsg();
   shaftOpener.updateShaftIdentifier(shaftMsg.ensureShaftIdentifier());
-  shaftOpener.updateShaftInnerState(shaftMsg.ensureInnerState());
+  // shaftOpener.updateShaftInnerState(shaftMsg.ensureInnerState());
   return shaftMsg..freeze();
 }
 
@@ -234,6 +264,7 @@ VoidCallback openShaftAction({
     openShaftOpener(
       shaftCtx: shaftCtx,
       shaftOpener: shaftOpener,
+      shaftEphemeralRecord: null,
     );
   };
 }
@@ -241,9 +272,11 @@ VoidCallback openShaftAction({
 void openShaftOpener({
   @ext required ShaftCtx shaftCtx,
   @ext required ShaftOpener shaftOpener,
+  required ShaftEphemeralRecord? shaftEphemeralRecord,
 }) {
   shaftCtx.openShaftMsg(
     shaftMsg: shaftOpener.openerShaftMsg(),
+    shaftEphemeralRecord: shaftEphemeralRecord,
   );
 }
 
@@ -271,6 +304,13 @@ VoidCallback? shaftCloseAction({
 
   return () {
     assert(shaftCtx.shaftIsInStack());
+
+    for (final shaft in shaftCtx.shaftCtxRightIterable()) {
+      final record = shaftCtx.windowObj.shaftEphemeralStore
+          .remove(shaft.shaftCtxShaftSeq());
+      record?.disposers.dispose();
+    }
+
     shaftCtx.windowUpdateView(() {
       shaftCtx.windowObj.windowStateWatchVar.topShaft.value =
           shaftOnLeft.shaftMsg;

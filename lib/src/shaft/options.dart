@@ -24,6 +24,7 @@ class OptionsShaftFactory extends ShaftFactory {
       }),
       callShaftInterface: voidShaftInterface,
       callParseShaftIdentifier: keyOnlyShaftIdentifier,
+      callLoadShaftEphemeralData: shaftWithoutEphemeralData,
     );
   }
 }

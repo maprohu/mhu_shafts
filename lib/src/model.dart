@@ -81,9 +81,11 @@ ShaftMsg createDefaultShaftMsg() {
 void ensureShaftMsgMainMenu({
   @Ext() required ShaftMsg shaftMsg,
 }) {
-  shaftMsg.ensureShaftIdentifier().shaftFactoryKey = mshShaftFactories
-      .lookupSingletonByType<MainMenuShaftFactory>()
-      .getShaftFactoryKey();
+  shaftMsg.ensureShaftIdentifier().shaftFactoryKeyPath.add(
+        mshShaftFactories
+            .lookupSingletonByType<MainMenuShaftFactory>()
+            .getShaftFactoryKey(),
+      );
 }
 
 ShaftMsg ensureEffectiveTopShaft({
@@ -116,10 +118,10 @@ MshShaftMsg? shaftMsgByIndexFromLeft(
   return listTowardsLeft.getOrNull(reverseIndex);
 }
 
-ShaftIdentifierMsg innerShaftIdentifierMsg({
-  @ext required ShaftIdentifierMsg shaftIdentifierMsg,
-}) {
-  return shaftIdentifierMsg.anyData.data.let(
-    MshShaftIdentifierMsg.fromBuffer,
-  )..freeze();
-}
+// ShaftIdentifierMsg innerShaftIdentifierMsg({
+//   @ext required ShaftIdentifierMsg shaftIdentifierMsg,
+// }) {
+//   return shaftIdentifierMsg.anyData.rawValue.let(
+//     MshShaftIdentifierMsg.fromBuffer,
+//   )..freeze();
+// }

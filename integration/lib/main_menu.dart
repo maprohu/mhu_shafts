@@ -7,38 +7,29 @@ ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
     shaftLabel: stringConstantShaftLabel("Main Menu"),
     callShaftContent: shaftMenuContent((shaftCtx) {
       return [
-        sampleShaftOpener<SampleProtoShaftFactory>().shaftOpenerMenuItem(
+        sampleShaftOpener<SampleFileSystemRootShaftFactory>()
+            .shaftOpenerMenuItem(
           shaftCtx: shaftCtx,
         ),
-        sampleAsyncShaftOpener<SampleProtoShaftFactory>(
-          updateShaftInnerState: () {
-            return CancelableOperation.fromFuture(
-              Future.delayed(
-                const Duration(
-                  seconds: 2,
-                ),
-                () {
-                  return (_) {};
-                },
-              ),
-            );
-          },
-        ).asyncShaftOpenerMenuItem(
-          shaftCtx: shaftCtx,
-          elementId: null,
-        ),
-        // menuItemStatic(
-        //   action: () {
-        //     shaftCtx.shaftCtxRequestWindowFocus(
-        //       elementId: null,
-        //       handlePressedKey: (pressedKey, release) {
-        //         if (pressedKey == PressedKey.escape) {
-        //           release();
-        //         }
-        //       },
+        // sampleShaftOpener<SampleAsyncShaftFactory>().shaftOpenerMenuItem(
+        //   shaftCtx: shaftCtx,
+        // ),
+        // sampleAsyncShaftOpener<SampleProtoShaftFactory>(
+        //   updateShaftInnerState: () {
+        //     return CancelableOperation.fromFuture(
+        //       Future.delayed(
+        //         const Duration(
+        //           seconds: 2,
+        //         ),
+        //         () {
+        //           return (_) {};
+        //         },
+        //       ),
         //     );
         //   },
-        //   label: "Async Opener",
+        // ).asyncShaftOpenerMenuItem(
+        //   shaftCtx: shaftCtx,
+        //   elementId: null,
         // ),
         menuItemStatic(
           action: shaftCtx.windowResetView,
@@ -49,5 +40,6 @@ ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
     // callShaftFocusHandler: focused.watchValue,
     callShaftInterface: voidShaftInterface,
     callParseShaftIdentifier: keyOnlyShaftIdentifier,
+    callLoadShaftEphemeralData: shaftWithoutEphemeralData,
   );
 }

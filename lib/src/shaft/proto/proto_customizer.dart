@@ -2,7 +2,6 @@ import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_pbschema/mhu_dart_pbschema.dart';
 import 'package:mhu_shafts/mhu_shafts.dart';
-import 'package:mhu_shafts/src/bx/menu.dart';
 import 'package:mhu_shafts/src/proto.dart';
 import 'package:mhu_shafts/src/screen/calc.dart';
 import 'package:protobuf/protobuf.dart';

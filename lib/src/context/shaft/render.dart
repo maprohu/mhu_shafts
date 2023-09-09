@@ -27,6 +27,7 @@ ShaftLayout renderShaft({
                 action: () {
                   optionsOpener.openShaftOpener(
                     shaftCtx: rectCtx,
+                    shaftEphemeralRecord: null,
                   );
                 },
                 horizontal: null,

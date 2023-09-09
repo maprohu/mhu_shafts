@@ -177,12 +177,10 @@ AimHandlerData createAimHandlerData({
                   },
                 );
 
-                aimHandlerData.currentNode = (pressedKey) {
-                  processLevel(
-                    level: nextLevel,
-                    aims: foundAims,
-                  );
-                };
+                aimHandlerData.currentNode = processLevel(
+                  level: nextLevel,
+                  aims: foundAims,
+                );
             }
           }
         case ControlKey():

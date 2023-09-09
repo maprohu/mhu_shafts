@@ -1,21 +1,21 @@
 part of '../rect.dart';
 
-SharingBoxes rectMessageSharingBoxes({
+SharingBoxes rectMonoTextSharingBoxes({
   @ext required RectCtx rectCtx,
-  required String message,
+  required String text,
 }) {
-  return rectMessageSharingBox(
+  return rectMonoTextSharingBox(
     rectCtx: rectCtx,
-    message: message,
+    text: text,
   ).toSingleElementIterable;
 }
 
-SharingBox rectMessageSharingBox({
+SharingBox rectMonoTextSharingBox({
   @ext required RectCtx rectCtx,
-  required String message,
+  required String text,
 }) {
   final monoTextCtx = rectCtx.defaultMonoTextCtx();
   return monoTextCtx.monoTextCtxSharingBox(
-    string: message,
+    string: text,
   );
 }

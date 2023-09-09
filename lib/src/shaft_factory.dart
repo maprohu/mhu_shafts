@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:async/async.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
+import 'package:mhu_dart_model/mhu_dart_model.dart';
 import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/proto.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
@@ -26,8 +31,10 @@ part 'shaft_factory/focus.dart';
 part 'shaft_factory/menu.dart';
 
 part 'shaft_factory/identifier.dart';
+
 part 'shaft_factory/todo.dart';
 
+part 'shaft_factory/ephemeral.dart';
 
 typedef ShaftFactoryKey = int;
 
@@ -46,10 +53,19 @@ typedef ShaftContent = BuildSharingBoxes;
 @Has()
 typedef ShaftInterface = dynamic;
 
+@Has()
+typedef ShaftEphemeralData = dynamic;
+
+@Has()
+typedef LoadShaftEphemeralData = CancelableOperation<ShaftEphemeralData>
+    Function(
+  DspReg disposers,
+)?;
+
 @freezed
 class ShaftIdentifierObj<T> with _$ShaftIdentifierObj<T> {
   const factory ShaftIdentifierObj({
-    required ShaftFactoryKey shaftFactoryKey,
+    required IList<ShaftFactoryKey> shaftFactoryKeyPath,
     required T shaftIdentifierData,
   }) = _ShaftIdentifierObj;
 }
@@ -67,6 +83,7 @@ abstract class ShaftLabel
 abstract class ShaftDirectFocusContentActions
     implements
         // HasShaftFocusHandler,
+        HasLoadShaftEphemeralData,
         HasShaftContent {}
 
 @Compose()
@@ -76,7 +93,7 @@ abstract class ShaftDirectContentActions
 @Compose()
 abstract class ShaftContentActions
     implements
-        // HasCallShaftFocusHandler,
+        HasCallLoadShaftEphemeralData,
         HasCallShaftContent,
         HasCallShaftInterface {}
 
@@ -99,6 +116,7 @@ final ShaftFactories mshShaftFactories = Singletons.mixin({
   1: MainMenuShaftFactory(),
   2: OptionsShaftFactory(),
   3: CustomShaftFactory(),
+  4: IoShaftFactory(),
   100: ProtoFieldShaftFactory(),
 });
 
@@ -106,22 +124,22 @@ late final mshCustomShaftFactoryKey = mshShaftFactories
     .lookupSingletonByType<CustomShaftFactory>()
     .getShaftFactoryKey();
 
-ShaftActions mshCustomShaftActions({
-  @ext required ShaftActions shaftActions,
-}) {
-  return shaftActions.shaftActionsWithCallParseShaftIdentifier(
-    lazy(() {
-      return (shaftIdentifierMsg) {
-        return ShaftIdentifierObj(
-          shaftFactoryKey: mshCustomShaftFactoryKey,
-          shaftIdentifierData: shaftActions.callParseShaftIdentifier().call(
-                shaftIdentifierMsg.innerShaftIdentifierMsg(),
-              ),
-        );
-      };
-    }),
-  );
-}
+// ShaftActions mshCustomShaftActions({
+//   @ext required ShaftActions shaftActions,
+// }) {
+//   return shaftActions.shaftActionsWithCallParseShaftIdentifier(
+//     lazy(() {
+//       return (shaftIdentifierMsg) {
+//         return ShaftIdentifierObj(
+//           shaftFactoryKey: mshCustomShaftFactoryKey,
+//           shaftIdentifierData: shaftActions.callParseShaftIdentifier().call(
+//                 shaftIdentifierMsg.innerShaftIdentifierMsg(),
+//               ),
+//         );
+//       };
+//     }),
+//   );
+// }
 
 ShaftFactoryKey getShaftFactoryKey({
   @Ext() required ShaftFactory shaftFactory,
@@ -173,5 +191,8 @@ ShaftContentActions callContentActions({
   return ComposedShaftContentActions(
     callShaftContent: () => contentActions.shaftContent,
     callShaftInterface: () => contentActions.shaftInterface,
+    callLoadShaftEphemeralData: () => contentActions.loadShaftEphemeralData,
   );
 }
+
+typedef ShaftIdentifierLift<T> = AnyMsgLift<T>;

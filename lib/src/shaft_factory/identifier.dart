@@ -1,23 +1,40 @@
 part of '../shaft_factory.dart';
 
-ParseShaftIdentifier keyOnlyShaftIdentifier() {
+ParseShaftIdentifier<void> keyOnlyShaftIdentifier() {
+  return convertShaftIdentifier(
+    dataConverter: (value) => null,
+  );
+}
+
+ParseShaftIdentifier<T> convertShaftIdentifier<T>({
+  required Convert<CmnAnyMsg, T> dataConverter,
+}) {
   return (shaftIdentifierMsg) {
     return ShaftIdentifierObj(
-      shaftFactoryKey: shaftIdentifierMsg.shaftFactoryKey,
-      shaftIdentifierData: null,
+      shaftFactoryKeyPath: shaftIdentifierMsg.shaftFactoryKeyPath.toIList(),
+      shaftIdentifierData: dataConverter(shaftIdentifierMsg.anyData),
     );
   };
 }
 
-ParseShaftIdentifier<M> parseShaftIdentifierOf<M extends Msg>({
+ParseShaftIdentifier<M> msgShaftIdentifierOf<M extends Msg>({
   @ext required CreateValue<M> create,
 }) {
-  return (shaftIdentifierMsg) {
-    return ShaftIdentifierObj<M>(
-      shaftFactoryKey: shaftIdentifierMsg.shaftFactoryKey,
-      shaftIdentifierData: create()
-        ..mergeFromBuffer(shaftIdentifierMsg.anyData.data)
-        ..freeze(),
-    );
-  };
+  return convertShaftIdentifier(
+    dataConverter: (value) => create()
+      ..mergeFromBuffer(value.singleValue.messageValue)
+      ..freeze(),
+  );
+}
+
+ParseShaftIdentifier<String> stringDataShaftIdentifier() {
+  return convertShaftIdentifier(
+    dataConverter: (value) => value.singleValue.scalarValue.stringValue,
+  );
+}
+
+ParseShaftIdentifier<List<String>> repeatedStringDataShaftIdentifier() {
+  return convertShaftIdentifier(
+    dataConverter: (value) => value.repeatedStringValue.stringValues,
+  );
 }

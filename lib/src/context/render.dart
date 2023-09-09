@@ -23,7 +23,8 @@ part 'render/aim.dart';
 
 @Has()
 class RenderObj with MixRenderCtx {
-  late final windowStateMsg = renderCtx.dataObj.windowStateWatchVar.watchOrDefaultMessage();
+  late final windowStateMsg =
+      renderCtx.dataObj.windowStateWatchVar.watchOrDefaultMessage();
 
   late final themeWrap = renderCtx.appObj.themeWrapWatch();
   late final themeMsg = themeWrap.themeMsg;
@@ -102,32 +103,12 @@ RenderCtx createRenderCtx({
 RenderedView watchRenderRenderedView({
   @extHas required RenderObj renderObj,
 }) {
-  final focusedShaft = renderObj.renderCtx.windowObj.focusedShaftVar.watchValue();
+  final focusedShaft =
+      renderObj.renderCtx.windowObj.focusedShaftVar.watchValue();
 
   renderObj.focusedHandler = focusedShaft?.handlePressedKey;
 
   final visibleShafts = renderObj.visibleShafts;
-
-
-  // final shaftsThatNeedFocus = visibleShafts
-  //     .map((shaftCtx) {
-  //       final shaftObj = shaftCtx.shaftObj;
-  //       return shaftObj.shaftActions.callShaftFocusHandler();
-  //     })
-  //     .whereNotNull()
-  //     .toList();
-
-  // switch (shaftsThatNeedFocus) {
-  //   case []:
-  //     renderObj.focusedHandler = null;
-  //   case [final focusedShaft]:
-  //     renderObj.focusedHandler = focusedShaft;
-  //   case [..., final focusedShaft]:
-  //     logger.w("multiple focused shafts: $shaftsThatNeedFocus");
-  //     renderObj.focusedHandler = focusedShaft;
-  // }
-
-
 
   final shafts = visibleShafts
       .reversedIListIterable()

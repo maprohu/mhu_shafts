@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_shafts/mhu_shafts.dart';
-import 'package:mhu_shafts/src/bx/text.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 
 import '../../proto.dart';

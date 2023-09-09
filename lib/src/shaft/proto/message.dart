@@ -11,8 +11,8 @@ ShaftContent protoMessageShaftContent<M extends Msg>({
     final msg = shaftInterface.messageValue.watchValue();
     final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
-      return rectCtx.rectMessageSharingBoxes(
-        message: "Data does not exist.",
+      return rectCtx.rectMonoTextSharingBoxes(
+        text: "Data does not exist.",
       );
     }
     return [

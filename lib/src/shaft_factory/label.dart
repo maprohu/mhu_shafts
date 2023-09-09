@@ -21,12 +21,12 @@ CallShaftHeaderLabel stringShaftHeaderLabel(
 ShaftLabel stringConstantShaftLabel(
   String label,
 ) {
-  return stingCallShaftLabel(
+  return stringCallShaftLabel(
     label.toCall,
   );
 }
 
-ShaftLabel stingCallShaftLabel(
+ShaftLabel stringCallShaftLabel(
   String Function() label,
 ) {
   return ComposedShaftLabel(

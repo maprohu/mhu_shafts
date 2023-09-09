@@ -78,26 +78,26 @@ MenuItem menuItemStaticAction({
 
 MenuItem mshShaftOpenerMenuItem<F extends ShaftFactory>({
   @ext required ShaftCtx shaftCtx,
-  CmnAny? anyData,
-  UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
+  CmnAnyMsg? anyData,
+  // UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
 }) {
   return factoriesShaftOpenerMenuItem<F>(
     shaftCtx: shaftCtx,
     shaftFactories: mshShaftFactories,
     identifierAnyData: anyData,
-    updateShaftInnerState: updateShaftInnerState,
+    // updateShaftInnerState: updateShaftInnerState,
   );
 }
 
 MenuItem factoriesShaftOpenerMenuItem<F extends ShaftFactory>({
   @ext required ShaftCtx shaftCtx,
   @ext required ShaftFactories shaftFactories,
-  CmnAny? identifierAnyData,
-  UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
+  CmnAnyMsg? identifierAnyData,
+  // UpdateShaftInnerState updateShaftInnerState = shaftEmptyInnerState,
 }) {
   assert(F != ShaftFactory);
   final shaftOpener = shaftFactories.factoriesShaftOpenerOf<F>(
-    updateShaftInnerState: updateShaftInnerState,
+    // updateShaftInnerState: updateShaftInnerState,
     identifierAnyData: identifierAnyData,
   );
 
@@ -117,103 +117,181 @@ MenuItem shaftOpenerMenuItem({
   );
   final shaftObj = openedShaftCtx.shaftObj;
 
-  return menuItemStaticAction(
-    action: shaftOpener.openShaftAction(
-      shaftCtx: shaftCtx,
-    ),
-    wxRectBuilder: shaftObj.shaftActions.callShaftOpenerLabel(),
-    watchMenuItemSelected: () {
-      return isShaftOpen(
-        shaftOpener: shaftOpener,
+  final loadEphemeralData =
+      openedShaftCtx.shaftObj.shaftActions.callLoadShaftEphemeralData();
+
+  if (loadEphemeralData == null) {
+    return menuItemStaticAction(
+      action: shaftOpener.openShaftAction(
         shaftCtx: shaftCtx,
-      );
-    },
-  );
-}
-
-MenuItem asyncShaftOpenerMenuItem({
-  @ext required AsyncShaftOpener asyncShaftOpener,
-  @ext required ShaftCtx shaftCtx,
-  required dynamic elementId,
-}) {
-  final shaftOpener = ComposedShaftOpener(
-    updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
-    updateShaftInnerState: (innerStateMsg) {},
-  );
-  final openedShaftCtx = createOpenedShaftCtx(
-    shaftOpener: shaftOpener,
-    shaftCtx: shaftCtx,
-  );
-  final shaftObj = openedShaftCtx.shaftObj;
-
-  final shaftElementId = shaftCtx.shaftCtxElementId(
-    elementId: elementId,
-  );
-
-  return menuItemStaticAction(
-    action: () {
-      final updateInnerStateOp = asyncShaftOpener.asyncUpdateShaftInnerState();
-      final release = shaftCtx.windowUpdateView(() {
-        return shaftCtx.shaftCtxRequestWindowFocus(
-          elementId: elementId,
-          handlePressedKey: (pressedKey, release) {
-            if (pressedKey == PressedKey.escape) {
-              shaftCtx.windowUpdateView(() {
-                updateInnerStateOp.cancel();
-                release();
-              });
-            }
-          },
+      ),
+      wxRectBuilder: shaftObj.shaftActions.callShaftOpenerLabel(),
+      watchMenuItemSelected: () {
+        return isShaftOpen(
+          shaftOpener: shaftOpener,
+          shaftCtx: shaftCtx,
         );
-      });
+      },
+    );
+  } else {
+    final elementId = shaftObj.shaftIdentifierObj;
 
-      updateInnerStateOp.value.then((updateInnerState) {
-        shaftCtx.windowUpdateView(() {
-          openShaftOpener(
-            shaftCtx: shaftCtx,
-            shaftOpener: ComposedShaftOpener(
-              updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
-              updateShaftInnerState: updateInnerState,
-            ),
+    final shaftElementId = shaftCtx.shaftCtxElementId(
+      elementId: elementId,
+    );
+
+    return menuItemStaticAction(
+      action: () {
+        final disposers = DspImpl();
+        final loadingData = loadEphemeralData(disposers);
+        final release = shaftCtx.windowUpdateView(() {
+          return shaftCtx.shaftCtxRequestWindowFocus(
+            elementId: elementId,
+            handlePressedKey: (pressedKey, releaseFocus) {
+              if (pressedKey == PressedKey.escape) {
+                shaftCtx.windowUpdateView(() {
+                  loadingData.cancel();
+                  disposers.dispose();
+                  releaseFocus();
+                });
+              }
+            },
           );
-
-          release.releaseFocus();
         });
-      });
-    },
-    wxRectBuilder: (rectCtx) {
-      return watchWidget(() {
-        final focused = shaftCtx.windowObj.focusedShaftVar()?.shaftElementId;
 
-        final labelBuilder = shaftObj.shaftActions.callShaftOpenerLabel();
-        if (shaftElementId == focused) {
-          return rectCtx.wxRectFillRight(
-            left: [
-              wxSizedBox(
-                widget: const CircularProgressIndicator(),
-                size: Size.square(
-                  shaftCtx
-                      .renderCtxThemeWrap()
-                      .menuItemPaddingSizer
-                      .innerHeight,
-                ),
+        loadingData.value.then((ephemeralData) {
+          shaftCtx.windowUpdateView(() {
+            openShaftOpener(
+              shaftCtx: shaftCtx,
+              shaftOpener: shaftOpener,
+              shaftEphemeralRecord: (
+                data: ephemeralData,
+                disposers: disposers,
               ),
-            ],
-            right: labelBuilder,
-          ).widget;
-        } else {
-          return labelBuilder(rectCtx).widget;
-        }
-      }).createWx(size: rectCtx.size);
-    },
-    watchMenuItemSelected: () {
-      return isShaftOpen(
-        shaftOpener: shaftOpener,
-        shaftCtx: shaftCtx,
-      );
-    },
-  );
+            );
+
+            release.releaseFocus();
+          });
+        });
+      },
+      wxRectBuilder: (rectCtx) {
+        return watchWidget(() {
+          final focused = shaftCtx.windowObj.focusedShaftVar()?.shaftElementId;
+
+          final labelBuilder = shaftObj.shaftActions.callShaftOpenerLabel();
+          if (shaftElementId == focused) {
+            return rectCtx.wxRectFillRight(
+              left: [
+                wxSizedBox(
+                  widget: const CircularProgressIndicator(),
+                  size: Size.square(
+                    shaftCtx
+                        .renderCtxThemeWrap()
+                        .menuItemPaddingSizer
+                        .innerHeight,
+                  ),
+                ),
+              ],
+              right: labelBuilder,
+            ).widget;
+          } else {
+            return labelBuilder(rectCtx).widget;
+          }
+        }).createWx(size: rectCtx.size);
+      },
+      watchMenuItemSelected: () {
+        return isShaftOpen(
+          shaftOpener: shaftOpener,
+          shaftCtx: shaftCtx,
+        );
+      },
+    );
+  }
 }
+
+// MenuItem asyncShaftOpenerMenuItem({
+//   @ext required AsyncShaftOpener asyncShaftOpener,
+//   @ext required ShaftCtx shaftCtx,
+//   required dynamic elementId,
+// }) {
+//   final shaftOpener = ComposedShaftOpener(
+//     updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
+//     updateShaftInnerState: (innerStateMsg) {},
+//   );
+//   final openedShaftCtx = createOpenedShaftCtx(
+//     shaftOpener: shaftOpener,
+//     shaftCtx: shaftCtx,
+//   );
+//   final shaftObj = openedShaftCtx.shaftObj;
+//
+//   final shaftElementId = shaftCtx.shaftCtxElementId(
+//     elementId: elementId,
+//   );
+//
+//   return menuItemStaticAction(
+//     action: () {
+//       final updateInnerStateOp = asyncShaftOpener.asyncUpdateShaftInnerState();
+//       final release = shaftCtx.windowUpdateView(() {
+//         return shaftCtx.shaftCtxRequestWindowFocus(
+//           elementId: elementId,
+//           handlePressedKey: (pressedKey, release) {
+//             if (pressedKey == PressedKey.escape) {
+//               shaftCtx.windowUpdateView(() {
+//                 updateInnerStateOp.cancel();
+//                 release();
+//               });
+//             }
+//           },
+//         );
+//       });
+//
+//       updateInnerStateOp.value.then((updateInnerState) {
+//         shaftCtx.windowUpdateView(() {
+//           openShaftOpener(
+//             shaftCtx: shaftCtx,
+//             shaftOpener: ComposedShaftOpener(
+//               updateShaftIdentifier: asyncShaftOpener.updateShaftIdentifier,
+//               updateShaftInnerState: updateInnerState,
+//             ),
+//           );
+//
+//           release.releaseFocus();
+//         });
+//       });
+//     },
+//     wxRectBuilder: (rectCtx) {
+//       return watchWidget(() {
+//         final focused = shaftCtx.windowObj.focusedShaftVar()?.shaftElementId;
+//
+//         final labelBuilder = shaftObj.shaftActions.callShaftOpenerLabel();
+//         if (shaftElementId == focused) {
+//           return rectCtx.wxRectFillRight(
+//             left: [
+//               wxSizedBox(
+//                 widget: const CircularProgressIndicator(),
+//                 size: Size.square(
+//                   shaftCtx
+//                       .renderCtxThemeWrap()
+//                       .menuItemPaddingSizer
+//                       .innerHeight,
+//                 ),
+//               ),
+//             ],
+//             right: labelBuilder,
+//           ).widget;
+//         } else {
+//           return labelBuilder(rectCtx).widget;
+//         }
+//       }).createWx(size: rectCtx.size);
+//     },
+//     watchMenuItemSelected: () {
+//       return isShaftOpen(
+//         shaftOpener: shaftOpener,
+//         shaftCtx: shaftCtx,
+//       );
+//     },
+//   );
+// }
 
 TextCtx menuItemText({
   @ext required RectCtx rectCtx,

@@ -20,3 +20,35 @@ RichText createRichText({
     maxLines: 1,
   );
 }
+
+Size mdiTextSize(String text, TextStyle style) {
+  return TextSpan(
+    text: text,
+    style: style,
+  ).size;
+}
+extension SizedTextSpanX on TextSpan {
+  Size get size {
+    final TextPainter textPainter = TextPainter(
+      text: this,
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(
+      minWidth: 0,
+      maxWidth: double.infinity,
+    );
+    return textPainter.size;
+  }
+
+  Size wrapSize(double width) {
+    final TextPainter textPainter = TextPainter(
+      text: this,
+      textDirection: TextDirection.ltr,
+    )..layout(
+      minWidth: 0,
+      maxWidth: width,
+    );
+    return textPainter.size;
+  }
+
+}

@@ -5,3 +5,4 @@ export 'src/context/rect.dart';
 export 'src/shaft/proto/proto.dart';
 export 'src/shaft/proto/proto_customizer.dart';
 export 'src/model.dart';
+export 'src/shaft.dart';

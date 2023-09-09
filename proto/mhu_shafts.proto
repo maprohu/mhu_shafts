@@ -49,8 +49,9 @@ message MshShaftNotificationMsg {
 }
 
 message MshShaftIdentifierMsg {
-  int32 shaft_factory_key = 1;
-  CmnAny any_data = 2;
+//  int32 shaft_factory_key = 1;
+  repeated int32 shaft_factory_key_path = 3;
+  CmnAnyMsg any_data = 2;
 
   message Field {
     int32 tag_number = 1;
