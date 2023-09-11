@@ -9,7 +9,7 @@ SharingBox chunkedListRectVerticalSharingBox({
   return rectCtx.chunkedRectVerticalSharingBox(
     itemHeight: itemHeight,
     itemCount: items.length,
-    startAt: 0,
+    pageNumber: 0,
     itemBuilder: (index, rectCtx) {
       return items[index].call(rectCtx);
     },
@@ -21,7 +21,7 @@ SharingBox chunkedRectVerticalSharingBox({
   @ext required RectCtx rectCtx,
   required double itemHeight,
   required int itemCount,
-  required int startAt,
+  required int pageNumber,
   required Wx Function(int index, RectCtx rectCtx) itemBuilder,
   required double? dividerThickness,
   SharingBox? emptyBx,
@@ -49,7 +49,7 @@ SharingBox chunkedRectVerticalSharingBox({
         ),
         itemHeight: itemHeight,
         itemCount: itemCount,
-        startAt: startAt,
+        pageNumber: pageNumber,
         itemBuilder: itemBuilder,
         dividerThickness: dividerThickness,
       );
@@ -61,10 +61,11 @@ Wx wxChunkedRectVertical({
   required RectCtx rectCtx,
   required double itemHeight,
   required int itemCount,
-  required int startAt,
+  required int pageNumber,
   required Wx Function(int index, RectCtx rectCtx) itemBuilder,
   required double? dividerThickness,
   SharingBox? emptyBx,
+  // required ChunkedContentKey chunkedContentKey,
 }) {
   final double effectiveDividerThickness = dividerThickness ?? 0;
   final themeWrap = rectCtx.renderObj.themeWrap;
@@ -143,6 +144,11 @@ Wx wxChunkedRectVertical({
       stretch: false,
     );
   } else {
+    // final pagerOpener = mshShaftOpenerOf<PagerShaftFactory>(
+    //   identifierAnyData: pagerShaftIdentifier(
+    //     chunkedContentKey: chunkedContentKey,
+    //   ),
+    // );
     return rectCtx.wxRectFillTop(
       top: (rectCtx) {
         final fitCount = itemFitCount(
@@ -151,24 +157,35 @@ Wx wxChunkedRectVertical({
           dividerThickness: effectiveDividerThickness,
         );
 
-        startAt = min(startAt, itemCount - fitCount);
+        final pageCount = itemCount ~/ fitCount;
+
+        pageNumber = min(pageCount - 1, pageNumber);
 
         return page(
           rectCtx: rectCtx,
-          startAt: startAt,
+          startAt: pageNumber * fitCount,
           count: fitCount,
           stretch: true,
         );
       },
       bottom: [
-        rectCtx.wxRectHorizontalLayoutDivider(
+        rectCtx.wxRectVerticalLayoutDivider(
           thickness: themeWrap.chunkedFooterDividerThickness,
         ),
         rectCtx
-            .rectWithHeight(
-              height: themeWrap.chunkedFooterPaddingSizer.callOuterHeight(),
+            .wxRectPaddingSizer(
+              paddingSizer: themeWrap.chunkedFooterPaddingSizer,
+              builder: (rectCtx) {
+                return rectCtx.defaultTextCtx().wxTextHorizontal(
+                      text: "$pageNumber",
+                    );
+                ;
+              },
             )
-            .wxEmpty(),
+            // .wxDecorateShaftOpener(
+            //   shaftOpener: pagerOpener,
+            //   shaftCtx: rectCtx,
+            // )
       ],
     );
   }

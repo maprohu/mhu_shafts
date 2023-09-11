@@ -11,6 +11,7 @@ CallShaftContent shaftMenuContent<D>(
         menuRectSharingBox(
           rectCtx: rectCtx,
           items: items(rectCtx),
+          pageNumber: 0,
         ),
       ];
     };

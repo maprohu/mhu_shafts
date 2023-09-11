@@ -4,65 +4,100 @@ ShaftLayout renderShaft({
   @Ext() required RectCtx rectCtx,
 }) {
   final shaftObj = rectCtx.shaftObj;
-  // final headerExtra = rectCtx.shaftObj.indexFromRight == 0
-  //     ? longRunningTaskIndicatorIcon(
-  //         appBits: sizedBits,
-  //       )
-  //     : null;
 
   final themeWrap = rectCtx.renderObj.themeWrap;
 
   final optionsOpener = mshShaftOpenerOf<OptionsShaftFactory>();
 
-  final headerWx = rectCtx.wxRectPaddingSizer(
-    paddingSizer: themeWrap.shaftHeaderPaddingSizer,
-    builder: (rectCtx) {
-      return rectCtx.wxRectFillLeft(
-        left: (rectCtx) {
-          return shaftObj.shaftActions.callShaftHeaderLabel().call(rectCtx);
-        },
-        right: [
-          rectCtx
-              .wxRectAim(
-                action: () {
-                  optionsOpener.openShaftOpener(
-                    shaftCtx: rectCtx,
-                    shaftEphemeralRecord: null,
-                  );
-                },
-                horizontal: null,
-                vertical: AxisAlignment.center,
-              )
-              .wxDecorateShaftOpener(
-                shaftOpener: optionsOpener,
-                shaftCtx: rectCtx,
+  final shaftLinear = rectCtx.columnCtx();
+
+  final headerWx = shaftLinear.linearPadding(
+    edgeInsets: themeWrap.shaftHeaderPaddingSizer.edgeInsets,
+    builder: (paddingCtx) {
+      final headerRow = paddingCtx.rowCtx();
+
+      return headerRow.wxLinearWidgets(widgets: [
+        headerRow.textShrinkingWidget(
+          textStyleWrap: themeWrap.defaultTextStyleWrap,
+          text: "hello",
+        ),
+        headerRow.linearGrowEmpty(),
+        headerRow
+            .wxAim(
+              watchAction: () => optionsOpener.openShaftAction(
+                shaftCtx: headerRow,
               ),
-        ],
-      );
+            )
+            .wxDecorateShaftOpener(
+              shaftOpener: optionsOpener,
+              shaftCtx: headerRow,
+            )
+            .solidWidgetWx(
+              linearCtx: headerRow,
+            ),
+      ]).solidWidgetWx(linearCtx: paddingCtx);
+
+      // return paddingCtx
+      //     .defaultTextCtx()
+      //     .wxTextHorizontal(text: "hello")
+      //     .solidWidgetWx(linearCtx: paddingCtx);
+
+      // return rectCtx.wxRectFillLeft(
+      //   left: (rectCtx) {
+      //     return shaftObj.shaftActions.callShaftHeaderLabel().call(rectCtx);
+      //   },
+      //   right: [
+      //     rectCtx
+      //         .wxRectAim(
+      //       action: () {
+      //         optionsOpener.openShaftOpener(
+      //           shaftCtx: rectCtx,
+      //           shaftEphemeralRecord: null,
+      //         );
+      //       },
+      //       horizontal: null,
+      //       vertical: AxisAlignment.center,
+      //     )
+      //         .wxDecorateShaftOpener(
+      //       shaftOpener: optionsOpener,
+      //       shaftCtx: rectCtx,
+      //     ),
+      //   ],
+      // );
     },
   );
 
-  final wx = rectCtx.wxRectFillBottom(
-    top: [
-      headerWx,
-      rectCtx.wxRectVerticalLayoutDivider(
-        thickness: themeWrap.shaftHeaderDividerThickness,
-      ),
-    ],
-    bottom: (rectCtx) {
-      return wxLinearShared(
-        size: rectCtx.size,
-        axis: Axis.vertical,
-        items: [
-          ...shaftObj.shaftActions.callShaftContent().call(rectCtx),
-        ],
-        themeWrap: themeWrap,
-        dividerThickness: themeWrap.shaftSharingDividerThickness,
-      );
-    },
-  ).wxBackgroundColor(
+  final wx = shaftLinear.wxLinearWidgets(widgets: [
+    // headerWx,
+    shaftLinear.linearDivider(
+      thickness: 10,
+      // thickness: themeWrap.shaftHeaderDividerThickness,
+    ),
+  ]).wxBackgroundColor(
     color: themeWrap.shaftBackgroundColor,
   );
+
+  // final wx = rectCtx.wxRectFillBottom(
+  //   top: [
+  //     headerWx,
+  //     rectCtx.wxRectVerticalLayoutDivider(
+  //       thickness: themeWrap.shaftHeaderDividerThickness,
+  //     ),
+  //   ],
+  //   bottom: (rectCtx) {
+  //     return wxLinearShared(
+  //       size: rectCtx.size,
+  //       axis: Axis.vertical,
+  //       items: [
+  //         ...shaftObj.shaftActions.callShaftContent().call(rectCtx),
+  //       ],
+  //       themeWrap: themeWrap,
+  //       dividerThickness: themeWrap.shaftSharingDividerThickness,
+  //     );
+  //   },
+  // ).wxBackgroundColor(
+  //   color: themeWrap.shaftBackgroundColor,
+  // );
   final shaftMsg = shaftObj.shaftMsg;
   return ShaftLayout(
     shaftSeq: shaftMsg.shaftSeq,

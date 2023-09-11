@@ -34,6 +34,7 @@ class SampleFileSystemRootShaftFactory extends SampleShaftFactory {
               disposers: disposers,
             );
       },
+      callShaftDataPersistence: shaftWithDefaultPersistence,
     );
   }
 }

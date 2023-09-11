@@ -35,6 +35,21 @@ void openShaftMsg({
         .rebuild(
           (msg) => msg.shaftSeq = shaftSeq,
         );
+
+    final openedShaftCtx = createMsgOpenedShaftCtx(
+      shaftMsg: shaftMsg,
+      shaftCtx: shaftCtx,
+    );
+
+    final persistence =
+        openedShaftCtx.shaftObj.shaftActions.callShaftDataPersistence();
+
+    if (persistence != null) {
+      openedShaftCtx.windowInitializeShaftPersistedData(
+        persistedDataActions: persistence,
+        shaftSeq: shaftSeq,
+      );
+    }
   });
 }
 
@@ -44,8 +59,14 @@ ShaftCtx createOpenedShaftCtx({
 }) {
   return shaftOpener
       .openerShaftMsg()
-      .addShaftMsgParent(shaftCtx: shaftCtx)
-      .createShaftCtx(
+      .createMsgOpenedShaftCtx(shaftCtx: shaftCtx);
+}
+
+ShaftCtx createMsgOpenedShaftCtx({
+  @ext required ShaftMsg shaftMsg,
+  @ext required ShaftCtx shaftCtx,
+}) {
+  return shaftMsg.addShaftMsgParent(shaftCtx: shaftCtx).createShaftCtx(
         renderCtx: shaftCtx,
         shaftOnRight: null,
       );
@@ -64,7 +85,7 @@ typedef UpdateShaftIdentifier = void Function(
 // typedef AsyncUpdateShaftInnerState
 //     = Call<CancelableOperation<UpdateShaftInnerState>>;
 
-void shaftEmptyInnerState(MshInnerStateMsg innerStateMsg) {}
+// void shaftEmptyInnerState(MshInnerStateMsg innerStateMsg) {}
 
 @Compose()
 abstract class ShaftOpener

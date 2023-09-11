@@ -12,5 +12,6 @@ class InvalidShaftFactory extends ShaftFactory {
         callShaftInterface: voidShaftInterface,
         callParseShaftIdentifier: keyOnlyShaftIdentifier,
         callLoadShaftEphemeralData: shaftWithoutEphemeralData,
+        callShaftDataPersistence: shaftWithoutDataPersistence,
       );
 }

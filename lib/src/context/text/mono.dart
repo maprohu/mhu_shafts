@@ -161,7 +161,7 @@ SharingBox monoTextCtxSharingBox({
   return monoTextCtx.chunkedRectVerticalSharingBox(
     itemHeight: monoTextStyle.sizeHeight(),
     itemCount: lines.length,
-    startAt: 0,
+    pageNumber: 0,
     itemBuilder: (index, rectCtx) {
       final text = lines[index];
 

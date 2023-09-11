@@ -25,6 +25,7 @@ class SampleAsyncShaftFactory extends SampleShaftFactory {
           );
         };
       },
+      callShaftDataPersistence: shaftWithoutDataPersistence,
     );
   }
 }

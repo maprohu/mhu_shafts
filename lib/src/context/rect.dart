@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_model/mhu_dart_model.dart';
+import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/src/context/shaft.dart';
 import 'package:mhu_shafts/src/context/text.dart';
 import 'package:mhu_shafts/src/shaft_factory.dart';
@@ -18,7 +20,6 @@ part 'rect.g.dart';
 
 part 'rect.g.has.dart';
 
-
 part 'rect/fill.dart';
 
 part 'rect/padding.dart';
@@ -32,7 +33,9 @@ part 'rect/chunk.dart';
 part 'rect/sharing_box.dart';
 
 part 'rect/menu.dart';
+
 part 'rect/linear.dart';
+
 part 'rect/text.dart';
 
 @Has()

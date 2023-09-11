@@ -18,6 +18,8 @@ part 'window.g.has.dart';
 
 part 'window.freezed.dart';
 
+part 'window/persist.dart';
+
 typedef ShaftElementId = ({
   ShaftSeq shaftSeq,
   dynamic elementId,
@@ -29,6 +31,7 @@ typedef FocusedShaftElement = ({
 });
 
 typedef ShaftEphemeralRecord = DisposableRecord<ShaftEphemeralData>;
+typedef ShaftPersistedRecord<D> = DisposableRecord<WatchWrite<D>>;
 
 @Has()
 class WindowObj with MixDisposers, MixWindowCtx {
@@ -56,6 +59,8 @@ class WindowObj with MixDisposers, MixWindowCtx {
   final focusedShaftVar = watchVar<FocusedShaftElement?>(null);
 
   final shaftEphemeralStore = <ShaftSeq, ShaftEphemeralRecord>{};
+
+  final shaftPersistedStore = <ShaftSeq, ShaftPersistedRecord>{};
 }
 
 @Compose()
@@ -76,42 +81,57 @@ Future<WindowCtx> createWindowCtx({
     windowObj: windowObj,
   )..initMixWindowCtx(windowObj);
 
-
   final loaders = await DspReg.perform((disposers) {
-    return disposers.watching(() {
-      final result = <AsyncCall>[];
-      final shafts = windowCtx
-          .createRenderCtx()
-          .renderObj
-          .shaftOnRightEnd
-          .shaftCtxLeftIterable()
-          .toList()
-          .reversed;
+    return disposers
+        .watching(
+          () => run(() sync* {
+            final shafts = windowCtx
+                .createRenderCtx()
+                .renderObj
+                .shaftOnRightEnd
+                .shaftCtxLeftIterable();
+            // .toList()
+            // .reversed;
 
-      for (final shaft in shafts) {
-        final loadEphemeral =
-            shaft.shaftObj.shaftActions.callLoadShaftEphemeralData();
+            for (final shaftCtx in shafts) {
+              final shaftActions = shaftCtx.shaftObj.shaftActions;
+              final loadEphemeral = shaftActions.callLoadShaftEphemeralData();
 
-        if (loadEphemeral != null) {
-          final disposers = DspImpl();
-          final loading = loadEphemeral(disposers).value;
-          final call = () async {
-            windowObj.shaftEphemeralStore[shaft.shaftCtxShaftSeq()] = (
-              disposers: disposers,
-              data: await loading,
-            );
-          };
-          result.add(call);
-        }
-      }
+              late final shaftSeq = shaftCtx.shaftCtxShaftSeq();
+              if (loadEphemeral != null) {
+                final disposers = DspImpl();
+                final loading = loadEphemeral(disposers).value;
+                yield () async {
+                  windowObj.shaftEphemeralStore[shaftSeq] = (
+                    disposers: disposers,
+                    data: await loading,
+                  );
+                };
+              }
 
-      return result;
-    }).readValue();
+              final persistence = shaftActions.callShaftDataPersistence();
+
+              if (persistence != null) {
+                yield () async {
+                  windowObj.shaftPersistedStore[shaftSeq] =
+                      await configCtx.loadShaftPersistedRecord(
+                    shaftSeq: shaftSeq,
+                    persistedDataActions: persistence,
+                  );
+                };
+              }
+            }
+          }).toList(),
+        )
+        .readValue();
   });
 
-  for (final loader in loaders) {
-    await loader();
-  }
+  await Future.wait(
+    loaders.map((fn) => fn()),
+  );
+  // for (final loader in loaders) {
+  //   await loader();
+  // }
 
   windowObj.startWindowRenderStream();
 

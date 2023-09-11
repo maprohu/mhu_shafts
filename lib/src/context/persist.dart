@@ -2,16 +2,22 @@ import 'package:isar/isar.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_commons/isar.dart';
+import 'package:mhu_dart_model/mhu_dart_model.dart';
 import 'package:mhu_dart_pbschema/mhu_dart_pbschema.dart';
 import 'package:mhu_shafts/proto.dart';
+import 'package:mhu_shafts/src/context/shaft.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:protobuf/protobuf.dart';
 
+import '../shaft_factory.dart';
 import 'persist.dart' as $lib;
 
 part 'persist.g.dart';
 
 part 'persist.g.has.dart';
+
+part 'persist/shaft.dart';
+part 'persist/chunk.dart';
 
 @Has()
 class PersistObj with MixIsar {
@@ -34,6 +40,7 @@ Future<PersistCtx> createPersistCtx({
   final isar = await Isar.open(
     [
       MshSingletonRecordSchema,
+      MshShaftPersistedDataRecordSchema,
       ...schemas,
     ],
     directory: dir.path,
@@ -51,7 +58,7 @@ Future<PersistCtx> createPersistCtx({
 }
 
 typedef MshIsarSingletonWatchFactory<M extends Object>
-    = IsarSingletonWatchFactory<M, MshSingletonRecord>;
+    = IsarSingletonWatchFactory<M>;
 
 MshIsarSingletonWatchFactory<M>
     mshIsarSingletonWatchFactory<M extends GeneratedMessage>({
@@ -60,8 +67,11 @@ MshIsarSingletonWatchFactory<M>
 }) {
   return createIsarSingletonProtoWriteOnlyWatchFactory(
     createValue: createValue,
-    createRecord: MshSingletonRecord.new,
     defaultValue: defaultValue,
+    collectionBits: isarCollectionBits<MshSingletonRecord>(
+      createIsarRecord: MshSingletonRecord.new,
+      isarIdAttribute: hasIsarIdAttribute(),
+    ),
   );
 }
 
@@ -70,7 +80,8 @@ abstract class MshWindowStateIsarSingletonWatchFactory
     implements MshIsarSingletonWatchFactory<MshWindowStateMsg> {
   static final instance =
       ComposedMshWindowStateIsarSingletonWatchFactory.isarSingletonWatchFactory(
-    isarSingletonWatchFactory: MshWindowStateMsg.new.mshIsarSingletonWatchFactory(),
+    isarSingletonWatchFactory:
+        MshWindowStateMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
@@ -83,30 +94,31 @@ abstract class MshThemeIsarSingletonWatchFactory
   );
 }
 
-@Compose()
-abstract class MshShaftNotificationsIsarSingletonWatchFactory
-    implements MshIsarSingletonWatchFactory<MshShaftNotificationsMsg> {
-  static final instance = ComposedMshShaftNotificationsIsarSingletonWatchFactory
-      .isarSingletonWatchFactory(
-    isarSingletonWatchFactory:
-        MshShaftNotificationsMsg.new.mshIsarSingletonWatchFactory(),
-  );
-}
+// @Compose()
+// abstract class MshShaftNotificationsIsarSingletonWatchFactory
+//     implements MshIsarSingletonWatchFactory<MshShaftNotificationsMsg> {
+//   static final instance = ComposedMshShaftNotificationsIsarSingletonWatchFactory
+//       .isarSingletonWatchFactory(
+//     isarSingletonWatchFactory:
+//         MshShaftNotificationsMsg.new.mshIsarSingletonWatchFactory(),
+//   );
+// }
 
 @Compose()
 abstract class MshSequencesIsarSingletonWatchFactory
     implements MshIsarSingletonWatchFactory<MshSequencesMsg> {
   static final instance =
       ComposedMshSequencesIsarSingletonWatchFactory.isarSingletonWatchFactory(
-    isarSingletonWatchFactory: MshSequencesMsg.new.mshIsarSingletonWatchFactory(),
+    isarSingletonWatchFactory:
+        MshSequencesMsg.new.mshIsarSingletonWatchFactory(),
   );
 }
 
 final isarSingletonWatchFactories =
-    createIsarSingletonWatchFactories<Msg, MshSingletonRecord>({
+    createIsarSingletonWatchFactories<Msg>({
   1: MshWindowStateIsarSingletonWatchFactory.instance,
   2: MshThemeIsarSingletonWatchFactory.instance,
-  3: MshShaftNotificationsIsarSingletonWatchFactory.instance,
+  // 3: MshShaftNotificationsIsarSingletonWatchFactory.instance,
   4: MshSequencesIsarSingletonWatchFactory.instance,
 });
 
@@ -138,7 +150,8 @@ Future<WatchProto<M>> mshProducePersistObjSingletonWatch<M extends Msg>({
 }) {
   assert(M != Msg);
   return isarSingletonWatchFactory.produceIsarSingletonWatch(
-    isarSingletonCollection: persistObj.isar.mshSingletonRecords,
+    isar: persistObj.isar,
+    // isarSingletonCollection: persistObj.isar.mshSingletonRecords,
     disposers: persistObj.flushDisposers,
   );
 }

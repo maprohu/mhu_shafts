@@ -11,13 +11,14 @@ SharingBox menuRectSharingBox({
   @ext required RectCtx rectCtx,
   required List<MenuItem> items,
   double? itemHeight,
+  required PageNumber pageNumber,
 }) {
   final themeWrap = rectCtx.renderCtxThemeWrap();
   itemHeight ??= themeWrap.menuItemPaddingSizer.callOuterHeight();
   return rectCtx.chunkedRectVerticalSharingBox(
     itemHeight: itemHeight,
     itemCount: items.length,
-    startAt: 0,
+    pageNumber: pageNumber,
     itemBuilder: (index, rectCtx) {
       final item = items[index];
       return rectCtx
@@ -118,7 +119,7 @@ MenuItem shaftOpenerMenuItem({
   final shaftObj = openedShaftCtx.shaftObj;
 
   final loadEphemeralData =
-      openedShaftCtx.shaftObj.shaftActions.callLoadShaftEphemeralData();
+      shaftObj.shaftActions.callLoadShaftEphemeralData();
 
   if (loadEphemeralData == null) {
     return menuItemStaticAction(

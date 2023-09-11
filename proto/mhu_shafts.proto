@@ -26,10 +26,9 @@ message MshDividerThicknessThemeMsg {
 }
 
 // shafts
-
-message MshNotificationMsg {
-  string text = 1;
-}
+//message MshNotificationMsg {
+//  string text = 1;
+//}
 
 message MshShaftMsg {
   MshShaftMsg parent = 1;
@@ -37,16 +36,16 @@ message MshShaftMsg {
   int32 width_units = 9;
 
   MshShaftIdentifierMsg shaft_identifier = 20;
-  MshInnerStateMsg inner_state = 19;
+//  MshInnerStateMsg inner_state = 19;
 }
 
-message  MshShaftNotificationsMsg {
-  map<int32, MshShaftNotificationMsg> by_index_from_left = 1;
-}
-
-message MshShaftNotificationMsg {
-  repeated MshNotificationMsg notifications = 1;
-}
+//message  MshShaftNotificationsMsg {
+//  map<int32, MshShaftNotificationMsg> by_index_from_left = 1;
+//}
+//
+//message MshShaftNotificationMsg {
+//  repeated MshNotificationMsg notifications = 1;
+//}
 
 message MshShaftIdentifierMsg {
 //  int32 shaft_factory_key = 1;
@@ -58,29 +57,36 @@ message MshShaftIdentifierMsg {
   }
 }
 
+message MshShaftDataMsg {
+  map<int32, MshShaftPackageDataMsg> packages = 1;
+  CmnAnyMsg any_data = 2;
+}
 
+message MshShaftPackageDataMsg {
+  map<int32, int32> chunk_pages = 1;
+}
 // identifier
 
-message  MshEmptyMsg {}
-
-message  MshConcreteFieldMsg {
-  int32 tag_number = 1;
-}
-
-message  MshOneofFieldMsg {
-  int32 oneof_index = 1;
-}
-
-message  MshMapEntryKeyMsg {
-  oneof type {
-    string string_key = 1;
-    int32 int_key = 2;
-  }
-}
-
-message MshViewTaskMsg {
-  int32 task_identifier = 1;
-}
+//message  MshEmptyMsg {}
+//
+//message  MshConcreteFieldMsg {
+//  int32 tag_number = 1;
+//}
+//
+//message  MshOneofFieldMsg {
+//  int32 oneof_index = 1;
+//}
+//
+//message  MshMapEntryKeyMsg {
+//  oneof type {
+//    string string_key = 1;
+//    int32 int_key = 2;
+//  }
+//}
+//
+//message MshViewTaskMsg {
+//  int32 task_identifier = 1;
+//}
 
 //message MshConfirmMsg {
 //  oneof type {
@@ -91,47 +97,47 @@ message MshViewTaskMsg {
 
 // inner state
 
-message  MshInnerStateMsg {
-  oneof type {
-    MshGenericMsg generic = 1;
-    MshStringEditStateMsg string_edit = 2;
-  }
-}
-
-message  MshEditIntMsg {
-  string text = 1;
-}
-
-message  MshEditStringMsg {
-  string text = 1;
-}
-
-message  MshMapEntryMsg {
-  MshMapEntryKeyMsg map_entry_key = 1;
-  MshScalarValueMsg map_entry_value = 2;
-}
-
-message  MshScalarValueMsg {
-  oneof type {
-    int32 int_value = 3;
-    string string_value = 4;
-    bool bool_value = 5;
-    bytes bytes_value = 6;
-  }
-}
-
-message  MshGenericMsg {
-  oneof type {
-    string string_value = 1;
-    int32 int32_value = 2;
-  }
-}
-
-message MshStringEditStateMsg {
-  string text = 1;
-  int32  cursor_position = 2;
-  bool pasting = 3;
-  bool focused = 4;
-}
-
+//message  MshInnerStateMsg {
+//  oneof type {
+//    MshGenericMsg generic = 1;
+//    MshStringEditStateMsg string_edit = 2;
+//  }
+//}
+//
+//message  MshEditIntMsg {
+//  string text = 1;
+//}
+//
+//message  MshEditStringMsg {
+//  string text = 1;
+//}
+//
+//message  MshMapEntryMsg {
+//  MshMapEntryKeyMsg map_entry_key = 1;
+//  MshScalarValueMsg map_entry_value = 2;
+//}
+//
+//message  MshScalarValueMsg {
+//  oneof type {
+//    int32 int_value = 3;
+//    string string_value = 4;
+//    bool bool_value = 5;
+//    bytes bytes_value = 6;
+//  }
+//}
+//
+//message  MshGenericMsg {
+//  oneof type {
+//    string string_value = 1;
+//    int32 int32_value = 2;
+//  }
+//}
+//
+//message MshStringEditStateMsg {
+//  string text = 1;
+//  int32  cursor_position = 2;
+//  bool pasting = 3;
+//  bool focused = 4;
+//}
+//
 // dart

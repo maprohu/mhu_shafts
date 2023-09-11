@@ -17,7 +17,7 @@ Wx wxLinear({
   );
 
   assert(
-    doubleRoughlyEqual(
+    assertDoubleRoughlyEqual(
       children.totalHasSizeAxis(axis: axis),
       size.sizeAxisDimension(
         axis: axis,

@@ -42,11 +42,11 @@ class RegisteredAimData {
   final AimAction aimAction;
 
   late final AimKeys aimKeys;
-  final pressedCountFw = fw<int?>(null);
+  final pressedCountFw = watchVar<int?>(null);
 
   late final aimKeysString = aimKeys.map((e) => e.character).join();
 
-  late final aimStateFr = fr(() {
+  late final aimStateFr = watching(() {
     final pressedCount = pressedCountFw();
     if (pressedCount == null) {
       return null;
@@ -234,7 +234,7 @@ AimRegistry createUnfocusedAimRegistry({
 
       return ComposedRegisteredAim(
         readAimKeys: () => registeredAimData.aimKeys,
-        watchAimState: registeredAimData.aimStateFr.watch,
+        watchAimState: registeredAimData.aimStateFr.watchValue,
       );
     },
   );

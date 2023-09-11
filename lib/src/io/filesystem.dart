@@ -38,8 +38,9 @@ class FileSystemShaftFactory extends IoShaftFactoryMarker {
       ),
       callShaftOpenerLabel: stringShaftOpenerLabel(
         () {
-          final leftState =
-              leftShaftInterface.callFileSystemShaftEphemeralData().watchValue();
+          final leftState = leftShaftInterface
+              .callFileSystemShaftEphemeralData()
+              .watchValue();
           final name = absolutePath.filePath.last;
 
           if (leftState case FileSystemShaftDirectory()) {
@@ -69,6 +70,7 @@ class FileSystemShaftFactory extends IoShaftFactoryMarker {
           );
         };
       },
+      callShaftDataPersistence: shaftWithDefaultPersistence,
     );
   }
 }
@@ -150,6 +152,7 @@ ShaftContent fileSystemShaftContent({
 
       case FileSystemShaftDirectory():
         yield rectCtx.menuRectSharingBox(
+          pageNumber: rectCtx.singleChunkedContentPageNumber(),
           items: state.listing.entries.map((entry) {
             final itemPath = absoluteFilePath.absolutePathChild$(entry.name);
             return ioShaftOpener<FileSystemShaftFactory>(

@@ -41,5 +41,6 @@ ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
     callShaftInterface: voidShaftInterface,
     callParseShaftIdentifier: keyOnlyShaftIdentifier,
     callLoadShaftEphemeralData: shaftWithoutEphemeralData,
+    callShaftDataPersistence: shaftWithoutDataPersistence,
   );
 }

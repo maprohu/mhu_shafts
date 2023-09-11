@@ -17,7 +17,7 @@ class DataObj with MixDataCtx, MixDisposers {
   late final dynamic config;
   late final WatchProto<MshWindowStateMsg> windowStateWatchVar;
   late final WatchProto<MshThemeMsg> themeWatchVar;
-  late final WatchProto<MshShaftNotificationsMsg> notificationsWatchVar;
+  // late final WatchProto<MshShaftNotificationsMsg> notificationsWatchVar;
   late final WatchProto<MshSequencesMsg> sequencesWatchVar;
 
   late final controlWrapWatch = disposers.watching(
@@ -45,10 +45,10 @@ Future<DataCtx> createDataCtx({
         .mshProducePersistObjSingletonWatch(persistObj: persistObj)
     ..sequencesWatchVar = await isarSingletonWatchFactories
         .lookupSingletonByType<MshSequencesIsarSingletonWatchFactory>()
-        .mshProducePersistObjSingletonWatch(persistObj: persistObj)
-    ..notificationsWatchVar = await isarSingletonWatchFactories
-        .lookupSingletonByType<MshShaftNotificationsIsarSingletonWatchFactory>()
         .mshProducePersistObjSingletonWatch(persistObj: persistObj);
+    // ..notificationsWatchVar = await isarSingletonWatchFactories
+    //     .lookupSingletonByType<MshShaftNotificationsIsarSingletonWatchFactory>()
+    //     .mshProducePersistObjSingletonWatch(persistObj: persistObj);
 
   return ComposedDataCtx.persistCtx(
     persistCtx: persistCtx,
@@ -61,3 +61,4 @@ WindowStateMsg watchWindowStateMsg({
 }) {
   return dataObj.windowStateWatchVar.watchOrDefaultMessage();
 }
+

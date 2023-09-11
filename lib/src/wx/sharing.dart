@@ -1,7 +1,5 @@
 part of 'wx.dart';
 
-@Has()
-typedef IntrinsicDimension = double;
 
 @Has()
 typedef WxDimensionBuilder = Wx Function(double dimension);
@@ -65,8 +63,6 @@ SharingBox emptySharingBox({
 @Has()
 typedef Index = int;
 
-@Has()
-typedef Dimension = double;
 
 @Compose()
 abstract class SharingSize implements HasIndex, HasIntrinsicDimension {}

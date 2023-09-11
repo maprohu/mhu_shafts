@@ -62,9 +62,9 @@ extension MshShaftMsgX on MshShaftMsg {
 //   }
 // }
 
-extension _Hack on ScalarAttribute<MshMapEntryKeyMsg, dynamic> {
-  ScalarAttribute<MshMapEntryKeyMsg, dynamic> get hack => this;
-}
+// extension _Hack on ScalarAttribute<MshMapEntryKeyMsg, dynamic> {
+//   ScalarAttribute<MshMapEntryKeyMsg, dynamic> get hack => this;
+// }
 
 ShaftMsg getEffectiveTopShaft({
   @Ext() required MshWindowStateMsg stateMsg,

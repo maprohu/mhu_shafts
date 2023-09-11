@@ -19,6 +19,7 @@ class SampleProtoShaftFactory extends SampleShaftFactory {
       callShaftInterface: () => shaftInterface,
       callParseShaftIdentifier: keyOnlyShaftIdentifier,
       callLoadShaftEphemeralData: shaftWithoutEphemeralData,
+      callShaftDataPersistence: shaftWithoutDataPersistence,
     );
   }
 }

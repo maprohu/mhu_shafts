@@ -5,6 +5,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_model/mhu_dart_model.dart';
+import 'package:mhu_dart_pbschema/mhu_dart_pbschema.dart';
 import 'package:mhu_shafts/mhu_shafts.dart';
 import 'package:mhu_shafts/proto.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
@@ -35,6 +36,8 @@ part 'shaft_factory/identifier.dart';
 part 'shaft_factory/todo.dart';
 
 part 'shaft_factory/ephemeral.dart';
+
+part 'shaft_factory/persist.dart';
 
 typedef ShaftFactoryKey = int;
 
@@ -88,11 +91,15 @@ abstract class ShaftDirectFocusContentActions
 
 @Compose()
 abstract class ShaftDirectContentActions
-    implements ShaftDirectFocusContentActions, HasShaftInterface {}
+    implements
+        ShaftDirectFocusContentActions,
+        HasShaftInterface,
+        HasShaftDataPersistence {}
 
 @Compose()
 abstract class ShaftContentActions
     implements
+        HasCallShaftDataPersistence,
         HasCallLoadShaftEphemeralData,
         HasCallShaftContent,
         HasCallShaftInterface {}
@@ -117,6 +124,7 @@ final ShaftFactories mshShaftFactories = Singletons.mixin({
   2: OptionsShaftFactory(),
   3: CustomShaftFactory(),
   4: IoShaftFactory(),
+  5: PagerShaftFactory(),
   100: ProtoFieldShaftFactory(),
 });
 
@@ -192,6 +200,7 @@ ShaftContentActions callContentActions({
     callShaftContent: () => contentActions.shaftContent,
     callShaftInterface: () => contentActions.shaftInterface,
     callLoadShaftEphemeralData: () => contentActions.loadShaftEphemeralData,
+    callShaftDataPersistence: () => contentActions.shaftDataPersistence,
   );
 }
 

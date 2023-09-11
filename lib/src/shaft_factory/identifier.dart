@@ -7,7 +7,7 @@ ParseShaftIdentifier<void> keyOnlyShaftIdentifier() {
 }
 
 ParseShaftIdentifier<T> convertShaftIdentifier<T>({
-  required Convert<CmnAnyMsg, T> dataConverter,
+  @ext required Convert<CmnAnyMsg, T> dataConverter,
 }) {
   return (shaftIdentifierMsg) {
     return ShaftIdentifierObj(
@@ -33,8 +33,29 @@ ParseShaftIdentifier<String> stringDataShaftIdentifier() {
   );
 }
 
+ParseShaftIdentifier<int> int32DataShaftIdentifier() {
+  return convertShaftIdentifier(
+    dataConverter: (value) => value.singleValue.scalarValue.int32Value,
+  );
+}
+
 ParseShaftIdentifier<List<String>> repeatedStringDataShaftIdentifier() {
   return convertShaftIdentifier(
     dataConverter: (value) => value.repeatedStringValue.stringValues,
   );
+}
+
+final anyInt32Lift = ComposedLift<AnyMsg, int>(
+  higher: (low) => low.singleValue.scalarValue.int32Value,
+  lower: (high) => AnyMsg()
+    ..ensureSingleValue().ensureScalarValue().int32Value = high
+    ..freeze(),
+);
+
+Call<ParseShaftIdentifier<T>> anyMsgLiftCallParseShaftIdentifier<T>({
+  @ext required AnyMsgLift<T> anyMsgLift,
+}) {
+  return () => convertShaftIdentifier(
+        dataConverter: anyMsgLift.higher,
+      );
 }
