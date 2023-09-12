@@ -32,17 +32,17 @@ class MshApp extends StatelessWidget {
         darkTheme: ThemeData.dark(),
         shortcuts: const {},
         home: Scaffold(
-          body: flcFrr(watchWidget),
+          body: watchWidget(watchInnerWidget),
         ),
       ),
     );
   }
 
-  Widget watchWidget() {
+  Widget watchInnerWidget() {
     final (
       :before,
       :after,
-    ) = windowObj.shaftsLayoutBeforeAfterFw.watch();
+    ) = windowObj.shaftsLayoutBeforeAfterFw.watchValue();
 
     if (after.shafts.isEmpty) {
       return busyWidget;

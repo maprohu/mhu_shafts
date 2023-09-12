@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
 import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_model/mhu_dart_model.dart';
@@ -64,6 +65,19 @@ RectCtx rectWithSize({
 }) {
   return rectCtx.createRectCtx(
     size: size,
+  );
+}
+
+RectCtx rectWithAxisDimension({
+  @ext required RectCtx rectCtx,
+  @ext required Axis axis,
+  required Dimension dimension,
+}) {
+  return rectCtx.rectWithSize(
+    size: rectCtx.sizeWithAxisDimension(
+      axis: axis,
+      dimension: dimension,
+    ),
   );
 }
 

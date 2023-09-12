@@ -13,6 +13,12 @@ Wx wxRectColumnExact({
 @Compose()
 abstract class LinearCtx implements RectCtx, OrientedBox {}
 
+@Compose()
+abstract class RowCtx implements LinearCtx, RectCtx {}
+
+@Compose()
+abstract class ColumnCtx implements LinearCtx, RectCtx {}
+
 LinearCtx createLinearCtx({
   @ext required RectCtx rectCtx,
   @ext required Axis axis,
@@ -23,19 +29,89 @@ LinearCtx createLinearCtx({
   );
 }
 
-LinearCtx rowCtx({
+LinearCtx linearWithAxisDimension({
+  @ext required LinearCtx linearCtx,
+  required Axis axis,
+  required Dimension dimension,
+}) {
+  return linearCtx.linearCtxWithSize(
+    linearCtx.size.sizeWithAxisDimension(
+      axis: axis,
+      dimension: dimension,
+    ),
+  );
+}
+
+LinearCtx linearWithMainDimension({
+  @ext required LinearCtx linearCtx,
+  required Dimension dimension,
+}) {
+  return linearCtx.linearWithAxisDimension(
+    axis: linearCtx.axis,
+    dimension: dimension,
+  );
+}
+
+LinearCtx linearWithAssignedDimension({
+  @ext required LinearCtx linearCtx,
+  required HasAssignedDimension dimensionHolder,
+}) {
+  return linearCtx.linearWithMainDimension(
+    dimension: dimensionHolder.assignedDimension(),
+  );
+}
+
+RowCtx asRowCtx({
+  @ext required LinearCtx linearCtx,
+}) {
+  switch (linearCtx) {
+    case RowCtx():
+      return linearCtx;
+    default:
+      assert(linearCtx.axis == Axis.horizontal);
+      return ComposedRowCtx.linearCtx(
+        linearCtx: linearCtx,
+      );
+  }
+}
+
+ColumnCtx asColumnCtx({
+  @ext required LinearCtx linearCtx,
+}) {
+  switch (linearCtx) {
+    case ColumnCtx():
+      return linearCtx;
+    default:
+      assert(linearCtx.axis == Axis.vertical);
+      return ComposedColumnCtx.linearCtx(
+        linearCtx: linearCtx,
+      );
+  }
+}
+
+LinearCtx linearWithCrossDimension({
+  @ext required LinearCtx linearCtx,
+  required Dimension dimension,
+}) {
+  return linearCtx.linearWithAxisDimension(
+    axis: linearCtx.crossAxis(),
+    dimension: dimension,
+  );
+}
+
+RowCtx createRowCtx({
   @ext required RectCtx rectCtx,
 }) {
-  return createLinearCtx(
+  return ComposedRowCtx.rectCtx(
     rectCtx: rectCtx,
     axis: Axis.horizontal,
   );
 }
 
-LinearCtx columnCtx({
+ColumnCtx createColumnCtx({
   @ext required RectCtx rectCtx,
 }) {
-  return createLinearCtx(
+  return ComposedColumnCtx.rectCtx(
     rectCtx: rectCtx,
     axis: Axis.vertical,
   );
@@ -45,6 +121,7 @@ Wx wxLinearWidgets({
   @ext required LinearCtx linearCtx,
   @ext required SizingWidgets widgets,
   bool fill = true,
+  AxisAlignment? crossAxisAlignment,
 }) {
   final crossAxis = linearCtx.crossAxis();
   final result = performWidgetLayout(
@@ -81,11 +158,25 @@ Wx wxLinearWidgets({
               .size,
         ),
     ];
-    return wxLinear(
+    var wx = wxLinear(
       children: children,
       axis: linearCtx.axis,
-      size: linearCtx.size,
+      size: fill
+          ? linearCtx
+              .orientedBoxWithCrossDimension(dimension: maxCrossSize)
+              .size
+          : null,
     );
+
+    if (crossAxisAlignment != null) {
+      wx = wx.wxAlignAxis(
+        size: linearCtx.size,
+        axis: linearCtx.crossAxis(),
+        axisAlignment: crossAxisAlignment,
+      );
+    }
+
+    return wx;
   }
 
   switch (result) {
@@ -114,10 +205,10 @@ GrowingWidget linearGrow({
   @ext required LinearCtx linearCtx,
   required WxGrowBuilder builder,
 }) {
-  final intrinsicDimension = builder(
-    mainExtra: 0,
-    crossExtra: 0,
-  ).size.sizeAxisDimension(
+  final intrinsicDimension = builder((
+    main: 0,
+    cross: 0,
+  )).size.sizeAxisDimension(
         axis: linearCtx.axis,
       );
   final holder = dimensionHolder();
@@ -125,10 +216,10 @@ GrowingWidget linearGrow({
     dimensionHolder: holder,
     intrinsicDimension: intrinsicDimension,
     createLinearWx: (extraCrossDimension) {
-      return builder(
-        mainExtra: holder.assignedDimension() - intrinsicDimension,
-        crossExtra: extraCrossDimension,
-      );
+      return builder((
+        main: holder.assignedDimension() - intrinsicDimension,
+        cross: extraCrossDimension,
+      ));
     },
   );
 }
@@ -137,18 +228,15 @@ GrowingWidget linearGrowEmpty({
   @ext required LinearCtx linearCtx,
 }) {
   return linearCtx.linearGrow(
-    builder: ({
-      required crossExtra,
-      required mainExtra,
-    }) {
+    builder: (grow) {
       return Size.zero
           .sizeWithAxisDimension(
             axis: linearCtx.axis,
-            dimension: mainExtra,
+            dimension: grow.main,
           )
           .sizeWithAxisDimension(
             axis: linearCtx.crossAxis(),
-            dimension: crossExtra,
+            dimension: grow.cross,
           )
           .wxEmpty();
     },
@@ -158,7 +246,7 @@ GrowingWidget linearGrowEmpty({
 SizingWidget linearPadding({
   @ext required LinearCtx linearCtx,
   required EdgeInsets edgeInsets,
-  required SizingWidget Function(LinearCtx paddingCtx) builder,
+  required SizingWidget Function(LinearCtx deflatedCtx) builder,
 }) {
   final innerCtx = linearCtx
       .rectWithSize(
@@ -230,5 +318,16 @@ SolidWidget linearDivider({
         thickness: thickness,
       );
     },
+  );
+}
+
+Wx wxLinearDividerStretch({
+  @ext required LinearCtx linearCtx,
+  required Dimension thickness,
+}) {
+  return wxRectDivider(
+    rectCtx: linearCtx,
+    layoutAxis: linearCtx.axis,
+    thickness: thickness,
   );
 }

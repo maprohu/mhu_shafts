@@ -25,7 +25,7 @@ ShaftDirectContentActions protoMapFieldContentActions({
           final entries =
               mapTypeActions.mapTypeActionsSortedEntries(mapValue: mapValue);
 
-          yield rectCtx.chunkedListRectVerticalSharingBox(
+          yield rectCtx.chunkedListSizingWidget(
             items: [
               for (final entry in entries)
                 shaftOpenerPreviewWxRectBuilder(
@@ -34,7 +34,10 @@ ShaftDirectContentActions protoMapFieldContentActions({
                   value: "<todo>",
                 )
             ],
-            itemHeight: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
+            itemDimension: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
+            emptySizingWidget: rectCtx.defaultTextRow(
+              text: "No entries.",
+            ),
           );
         },
       );

@@ -43,8 +43,8 @@ class WindowObj with MixDisposers, MixWindowCtx {
 
   late final updateViewExecutor = renderedViewWatch.runPaused;
 
-  late final Fw<BeforeAfter<ShaftsLayout>> shaftsLayoutBeforeAfterFw =
-      disposers.fw(
+  late final WatchWrite<BeforeAfter<ShaftsLayout>> shaftsLayoutBeforeAfterFw =
+      disposers.watchVar(
     (
       before: renderedViewWatch.readValue().shaftsLayout,
       after: renderedViewWatch.readValue().shaftsLayout,
@@ -162,7 +162,7 @@ void startWindowRenderStream({
   windowObj.renderedViewWatch.distinctValues().forEach(
     (renderedView) {
       windowObj.shaftsLayoutBeforeAfterFw.value = (
-        before: windowObj.shaftsLayoutBeforeAfterFw.read().after,
+        before: windowObj.shaftsLayoutBeforeAfterFw.readValue().after,
         after: renderedView.shaftsLayout,
       );
     },

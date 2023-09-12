@@ -45,7 +45,7 @@ Wx wxRectAimWatch({
   final registeredAim = rectCtx.renderObj.aimsRegistry.registerAim(watchAction);
 
   return wxSizedBox(
-    widget: flcFrr(() {
+    widget: watchWidget(() {
       final aimState = registeredAim.watchAimState();
 
       if (aimState == null) {

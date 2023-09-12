@@ -30,8 +30,9 @@ ShaftLabel stringCallShaftLabel(
   String Function() label,
 ) {
   return ComposedShaftLabel(
-    callShaftHeaderLabel: stringShaftHeaderLabel(label),
-    callShaftOpenerLabel: stringShaftOpenerLabel(label),
+    // callShaftHeaderLabel: stringShaftHeaderLabel(label),
+    // callShaftOpenerLabel: stringShaftOpenerLabel(label),
+    callShaftLabelString: label,
   );
 }
 

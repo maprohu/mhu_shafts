@@ -21,13 +21,11 @@ SharingBox rectMonoTextSharingBox({
 }
 
 ShrinkingWidget textShrinkingWidget({
-  @ext required LinearCtx linearCtx,
+  @ext required RowCtx rowCtx,
   @ext required TextStyleWrap textStyleWrap,
   required String text,
   Alignment alignment = Alignment.centerLeft,
 }) {
-  assert(linearCtx.axis == Axis.horizontal);
-
   final textSpan = textStyleWrap.createTextSpan(text);
 
   final size = textSpan.textSpanSize();
@@ -38,7 +36,7 @@ ShrinkingWidget textShrinkingWidget({
     dimensionHolder: holder,
     intrinsicDimension: size.width,
     createLinearWx: (extraCrossDimension) {
-      return linearCtx
+      return rowCtx
           .linearWxRect(
             dimensionHolder: holder,
             intrinsicSize: size,
@@ -85,5 +83,35 @@ RectCtx linearWxRect({
       intrinsicSize: intrinsicSize,
       extraCrossDimension: extraCrossDimension,
     ),
+  );
+}
+
+SolidWidget defaultTextRow({
+  @ext required ColumnCtx columnCtx,
+  AxisAlignment horizontal = AxisAlignment.left,
+  required String text,
+}) {
+  return columnCtx.textRow(
+    textStyleWrap: columnCtx.defaultTextCtx().textStyleWrap,
+    text: text,
+  );
+}
+
+SolidWidget textRow({
+  @ext required ColumnCtx columnCtx,
+  AxisAlignment horizontal = AxisAlignment.left,
+  @ext required TextStyleWrap textStyleWrap,
+  required String text,
+}) {
+  final textCtx = columnCtx.createTextCtx(textStyleWrap: textStyleWrap);
+
+  return columnCtx.solidWidgetStretchedWx(
+    createWx: () {
+      return wxTextHorizontal(
+        textCtx: textCtx,
+        text: text,
+        horizontal: horizontal,
+      );
+    },
   );
 }

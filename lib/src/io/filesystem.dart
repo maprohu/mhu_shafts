@@ -22,37 +22,37 @@ class FileSystemShaftFactory extends IoShaftFactoryMarker {
       callFileSystemShaftEphemeralData: () => ephemeralData,
     );
 
+    String labelString() {
+      final leftState =
+          leftShaftInterface.callFileSystemShaftEphemeralData().watchValue();
+      final name = absolutePath.filePath.last;
+
+      if (leftState case FileSystemShaftDirectory()) {
+        final entry = leftState.listing.directoryListingFindEntry$(name);
+        if (entry != null && entry.type == DirectoryEntryType.directory) {
+          return "$name/";
+        }
+      }
+
+      return name;
+    }
+
     return ComposedShaftActions(
-      callShaftHeaderLabel: stringShaftHeaderLabel(
-        () {
-          final state = ephemeralData.watchValue();
-          final name = absolutePath.filePath.last;
-
-          switch (state) {
-            case FileSystemShaftDirectory():
-              return "$name/";
-            default:
-              return name;
-          }
-        },
-      ),
-      callShaftOpenerLabel: stringShaftOpenerLabel(
-        () {
-          final leftState = leftShaftInterface
-              .callFileSystemShaftEphemeralData()
-              .watchValue();
-          final name = absolutePath.filePath.last;
-
-          if (leftState case FileSystemShaftDirectory()) {
-            final entry = leftState.listing.directoryListingFindEntry$(name);
-            if (entry != null && entry.type == DirectoryEntryType.directory) {
-              return "$name/";
-            }
-          }
-
-          return name;
-        },
-      ),
+      callShaftLabelString: labelString,
+      // callShaftHeaderLabel: stringShaftHeaderLabel(
+      //   () {
+      //     final state = ephemeralData.watchValue();
+      //     final name = absolutePath.filePath.last;
+      //
+      //     switch (state) {
+      //       case FileSystemShaftDirectory():
+      //         return "$name/";
+      //       default:
+      //         return name;
+      //     }
+      //   },
+      // ),
+      // callShaftOpenerLabel: stringShaftOpenerLabel(labelString),
       callShaftContent: () {
         return fileSystemShaftContent(
           ephemeralData: ephemeralData,
@@ -152,6 +152,7 @@ ShaftContent fileSystemShaftContent({
 
       case FileSystemShaftDirectory():
         yield rectCtx.menuRectSharingBox(
+          pageCountCallback: (_) {}, // TODO
           pageNumber: rectCtx.singleChunkedContentPageNumber(),
           items: state.listing.entries.map((entry) {
             final itemPath = absoluteFilePath.absolutePathChild$(entry.name);

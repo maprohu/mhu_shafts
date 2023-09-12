@@ -146,7 +146,7 @@ double calculateMonoTextStyleIntrinsicHeight({
   return monoTextStyle.sizeHeight() * intrinsicRowCount;
 }
 
-SharingBox monoTextCtxSharingBox({
+SizingWidget monoTextCtxSharingBox({
   @ext required MonoTextCtx monoTextCtx,
   required String string,
 }) {
@@ -158,8 +158,14 @@ SharingBox monoTextCtxSharingBox({
 
   final lines = string.slices(columnCount).toList().orIfEmpty(const [""]);
 
-  return monoTextCtx.chunkedRectVerticalSharingBox(
-    itemHeight: monoTextStyle.sizeHeight(),
+  final columnCtx = monoTextCtx.createColumnCtx();
+  return columnCtx.chunkedSizingWidget(
+    emptySizingWidget: columnCtx.textRow(
+      textStyleWrap: monoTextCtx.renderCtxThemeWrap().defaultTextStyleWrap,
+      text: "Empty string.",
+    ),
+    pageCountCallback: (_) {}, // TODO
+    itemDimension: monoTextStyle.sizeHeight(),
     itemCount: lines.length,
     pageNumber: 0,
     itemBuilder: (index, rectCtx) {

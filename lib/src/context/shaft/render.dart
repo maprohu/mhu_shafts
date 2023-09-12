@@ -9,17 +9,18 @@ ShaftLayout renderShaft({
 
   final optionsOpener = mshShaftOpenerOf<OptionsShaftFactory>();
 
-  final shaftLinear = rectCtx.columnCtx();
+  final shaftLinear = rectCtx.createColumnCtx();
+  final shaftActions = shaftObj.shaftActions;
 
   final headerWx = shaftLinear.linearPadding(
     edgeInsets: themeWrap.shaftHeaderPaddingSizer.edgeInsets,
     builder: (paddingCtx) {
-      final headerRow = paddingCtx.rowCtx();
+      final headerRow = paddingCtx.createRowCtx();
 
       return headerRow.wxLinearWidgets(widgets: [
         headerRow.textShrinkingWidget(
           textStyleWrap: themeWrap.defaultTextStyleWrap,
-          text: "hello",
+          text: shaftActions.callShaftLabelString(),
         ),
         headerRow.linearGrowEmpty(),
         headerRow
@@ -36,43 +37,15 @@ ShaftLayout renderShaft({
               linearCtx: headerRow,
             ),
       ]).solidWidgetWx(linearCtx: paddingCtx);
-
-      // return paddingCtx
-      //     .defaultTextCtx()
-      //     .wxTextHorizontal(text: "hello")
-      //     .solidWidgetWx(linearCtx: paddingCtx);
-
-      // return rectCtx.wxRectFillLeft(
-      //   left: (rectCtx) {
-      //     return shaftObj.shaftActions.callShaftHeaderLabel().call(rectCtx);
-      //   },
-      //   right: [
-      //     rectCtx
-      //         .wxRectAim(
-      //       action: () {
-      //         optionsOpener.openShaftOpener(
-      //           shaftCtx: rectCtx,
-      //           shaftEphemeralRecord: null,
-      //         );
-      //       },
-      //       horizontal: null,
-      //       vertical: AxisAlignment.center,
-      //     )
-      //         .wxDecorateShaftOpener(
-      //       shaftOpener: optionsOpener,
-      //       shaftCtx: rectCtx,
-      //     ),
-      //   ],
-      // );
     },
   );
 
   final wx = shaftLinear.wxLinearWidgets(widgets: [
-    // headerWx,
+    headerWx,
     shaftLinear.linearDivider(
-      thickness: 10,
-      // thickness: themeWrap.shaftHeaderDividerThickness,
+      thickness: themeWrap.shaftHeaderDividerThickness,
     ),
+    ...shaftActions.callShaftContent().call(shaftLinear),
   ]).wxBackgroundColor(
     color: themeWrap.shaftBackgroundColor,
   );

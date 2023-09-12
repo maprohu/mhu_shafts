@@ -42,6 +42,9 @@ part 'shaft_factory/persist.dart';
 typedef ShaftFactoryKey = int;
 
 @Has()
+typedef ShaftLabelString = String;
+
+@Has()
 typedef ShaftHeaderLabel = WxRectBuilder;
 
 @Has()
@@ -80,7 +83,10 @@ typedef ParseShaftIdentifier<T> = ShaftIdentifierObj<T> Function(
 
 @Compose()
 abstract class ShaftLabel
-    implements HasCallShaftHeaderLabel, HasCallShaftOpenerLabel {}
+    implements
+        // HasCallShaftHeaderLabel,
+        // HasCallShaftOpenerLabel,
+        HasCallShaftLabelString {}
 
 @Compose()
 abstract class ShaftDirectFocusContentActions

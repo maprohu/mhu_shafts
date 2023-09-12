@@ -12,6 +12,7 @@ import 'package:mhu_shafts/src/shaft/proto/proto_customizer.dart';
 import 'package:mhu_shafts/src/wx/wx.dart';
 import 'package:protobuf/protobuf.dart';
 
+import '../../layout.dart';
 import 'proto.dart' as $lib;
 // part 'proto.g.has.dart';
 part 'proto.g.dart';

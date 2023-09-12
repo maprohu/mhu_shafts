@@ -7,18 +7,26 @@ typedef WatchMenuItemSelected = WatchValue<bool>;
 abstract class MenuItem
     implements HasWatchAimAction, HasWxRectBuilder, HasWatchMenuItemSelected {}
 
-SharingBox menuRectSharingBox({
+SizingWidget menuRectSharingBox({
   @ext required RectCtx rectCtx,
   required List<MenuItem> items,
   double? itemHeight,
   required PageNumber pageNumber,
+  String emptyMessage = "No menu items.",
+  PageCountCallback pageCountCallback = ignore1,
 }) {
   final themeWrap = rectCtx.renderCtxThemeWrap();
   itemHeight ??= themeWrap.menuItemPaddingSizer.callOuterHeight();
-  return rectCtx.chunkedRectVerticalSharingBox(
-    itemHeight: itemHeight,
+  final columnCtx = rectCtx.createColumnCtx();
+  return columnCtx.chunkedSizingWidget(
+    itemDimension: itemHeight,
     itemCount: items.length,
     pageNumber: pageNumber,
+    pageCountCallback: pageCountCallback,
+    emptySizingWidget: columnCtx.textRow(
+      textStyleWrap: themeWrap.defaultTextStyleWrap,
+      text: emptyMessage,
+    ),
     itemBuilder: (index, rectCtx) {
       final item = items[index];
       return rectCtx
@@ -118,15 +126,15 @@ MenuItem shaftOpenerMenuItem({
   );
   final shaftObj = openedShaftCtx.shaftObj;
 
-  final loadEphemeralData =
-      shaftObj.shaftActions.callLoadShaftEphemeralData();
+  final loadEphemeralData = shaftObj.shaftActions.callLoadShaftEphemeralData();
 
   if (loadEphemeralData == null) {
     return menuItemStaticAction(
       action: shaftOpener.openShaftAction(
         shaftCtx: shaftCtx,
       ),
-      wxRectBuilder: shaftObj.shaftActions.callShaftOpenerLabel(),
+      wxRectBuilder:
+          stringShaftHeaderLabel(shaftObj.shaftActions.callShaftLabelString)(),
       watchMenuItemSelected: () {
         return isShaftOpen(
           shaftOpener: shaftOpener,
@@ -179,7 +187,9 @@ MenuItem shaftOpenerMenuItem({
         return watchWidget(() {
           final focused = shaftCtx.windowObj.focusedShaftVar()?.shaftElementId;
 
-          final labelBuilder = shaftObj.shaftActions.callShaftOpenerLabel();
+          final labelBuilder = stringShaftHeaderLabel(
+            shaftObj.shaftActions.callShaftLabelString,
+          )();
           if (shaftElementId == focused) {
             return rectCtx.wxRectFillRight(
               left: [

@@ -7,23 +7,24 @@ abstract class ProtoMessageShaftInterface<M extends Msg>
 ShaftContent protoMessageShaftContent<M extends Msg>({
   @ext required ProtoMessageShaftInterface<M> shaftInterface,
 }) {
-  return (rectCtx) {
+  return (rectCtx) sync* {
     final msg = shaftInterface.messageValue.watchValue();
     final themeWrap = rectCtx.renderCtxThemeWrap();
     if (msg == null) {
-      return rectCtx.rectMonoTextSharingBoxes(
+      yield rectCtx.rectMonoTextSharingBox(
         text: "Data does not exist.",
       );
+      return;
     }
-    return [
-      rectCtx.chunkedListRectVerticalSharingBox(
-        itemHeight: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
-        items: protoMessageFieldWxRectBuilders(
-          shaftInterface: shaftInterface,
-          msg: msg,
-        ).toList(),
-      ),
-    ];
+    final columnCtx = rectCtx.createColumnCtx();
+    yield columnCtx.chunkedListSizingWidget(
+      itemDimension: themeWrap.protoFieldPaddingSizer.callOuterHeight(),
+      emptySizingWidget: columnCtx.defaultTextRow(text: "No fields."),
+      items: protoMessageFieldWxRectBuilders(
+        shaftInterface: shaftInterface,
+        msg: msg,
+      ).toList(),
+    );
   };
 }
 
@@ -58,7 +59,6 @@ Iterable<WxRectBuilder> protoMessageFieldWxRectBuilders<M extends Msg>({
     }
   }
 }
-
 
 double calculateProtoMessageFieldItemInnerHeight({
   @ext required ThemeWrap themeWrap,

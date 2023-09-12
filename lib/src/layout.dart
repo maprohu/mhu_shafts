@@ -10,24 +10,40 @@ import 'package:mhu_shafts/src/context/text.dart';
 
 import 'layout.dart' as $lib;
 import 'wx/wx.dart';
+
 part 'layout.g.has.dart';
+
 part 'layout.g.dart';
 
 part 'layout.freezed.dart';
 
 part 'layout/widget_line.dart';
-part 'layout/text.dart';
 
+part 'layout/text.dart';
 
 int itemFitCount({
   required double available,
   required double itemSize,
-  required double dividerThickness,
+  required double? dividerThickness,
 }) {
   final remaining = available - itemSize;
   if (remaining < 0) {
     return 0;
   }
 
-  return 1 + (remaining ~/ (itemSize + dividerThickness));
+  return 1 + (remaining ~/ (itemSize + (dividerThickness ?? 0)));
+}
+
+int? itemPageCount({
+  required int itemCount,
+  required int fitCount,
+}) {
+  if (fitCount == 0) {
+    return null;
+  }
+  if (itemCount == 0) {
+    return 0;
+  }
+
+  return ((itemCount - 1) ~/ fitCount) + 1;
 }

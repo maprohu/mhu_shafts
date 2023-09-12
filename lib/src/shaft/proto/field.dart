@@ -102,7 +102,7 @@ ShaftDirectFocusContentActions
     nullableMsgProtoFieldShaftContentActions<V extends Object>({
   required ProtoFieldShaftInterface protoFieldShaftInterface,
   required TypeActions<V> typeActions,
-  required SharingBoxes Function(RectCtx rectCtx, V value) builder,
+  required SizingWidgets Function(ColumnCtx columnCtx, V value) builder,
 }) {
   return ComposedShaftDirectFocusContentActions(
     shaftContent: (rectCtx) {
@@ -124,18 +124,17 @@ ShaftDirectFocusContentActions
   required SharingBoxes Function(RectCtx rectCtx, V value) builder,
 }) {
   return ComposedShaftDirectFocusContentActions(
-    shaftContent: (rectCtx) {
-      return rectCtx.rectCtxNullableMsgSharingBoxes(
+    shaftContent: (columnCtx) {
+      return columnCtx.rectCtxNullableMsgSharingBoxes(
         protoFieldShaftInterface: protoFieldShaftInterface,
         typeActions: typeActions,
         builder: (value) sync* {
           if (value == null) {
-            yield rectCtx
-                .defaultTextCtx()
-                .wxTextHorizontal(text: "Value is null.")
-                .fixedVerticalSharingBox();
+            yield columnCtx.defaultTextRow(
+              text: "Value is null.",
+            );
           } else {
-            yield* builder(rectCtx, value);
+            yield* builder(columnCtx, value);
           }
         },
       );

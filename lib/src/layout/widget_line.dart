@@ -1,5 +1,10 @@
 part of '../layout.dart';
 
+typedef GrowDimensions = ({
+  Dimension main,
+  Dimension cross,
+});
+
 @Has()
 typedef FixedDimension = Dimension;
 
@@ -16,7 +21,7 @@ typedef AssignDimension = WriteValue<Dimension>;
 typedef AssignedDimension = ReadValue<Dimension>;
 
 @Has()
-typedef SizingWidgets = List<SizingWidget>;
+typedef SizingWidgets = Iterable<SizingWidget>;
 
 // @Has()
 // typedef CreateWx = CreateValue<Wx>;
@@ -38,10 +43,7 @@ sealed class SoftWidget implements SizingWidget, HasAssignDimension {}
 @Compose()
 abstract class GrowingWidget implements DimensionHolder, SoftWidget {}
 
-typedef WxGrowBuilder = Wx Function({
-  required Dimension mainExtra,
-  required Dimension crossExtra,
-});
+typedef WxGrowBuilder = Wx Function(GrowDimensions grow);
 
 @Compose()
 abstract class ShrinkingWidget implements DimensionHolder, SoftWidget {}
@@ -58,7 +60,7 @@ sealed class LayoutResult with _$LayoutResult {
 }
 
 LayoutResult performWidgetLayout({
-  required List<SizingWidget> sizingWidgets,
+  required SizingWidgets sizingWidgets,
   required Dimension availableSpace,
 }) {
   final solidWidgets = <SolidWidget>[];
@@ -183,7 +185,7 @@ SolidWidget solidWidgetWx({
 
 SolidWidget solidWidgetCreateWx({
   @ext required LinearCtx linearCtx,
-  @ext required CreateLinearWx createLinearWx,
+  required CreateLinearWx createLinearWx,
 }) {
   final wx = createLinearWx(0);
   return ComposedSolidWidget(
@@ -191,5 +193,30 @@ SolidWidget solidWidgetCreateWx({
       axis: linearCtx.axis,
     ),
     createLinearWx: createLinearWx,
+  );
+}
+
+SolidWidget solidWidgetStretchedWx({
+  @ext required LinearCtx linearCtx,
+  required Call<Wx> createWx,
+}) {
+  Wx assertWx() {
+    final wx = createWx();
+    assert(
+      linearCtx.assertOrientedCrossRoughlyEqual(size: wx.size),
+    );
+    return wx;
+  }
+
+  return ComposedSolidWidget(
+    intrinsicDimension: assertWx().sizeAxisDimension(
+      axis: linearCtx.axis,
+    ),
+    createLinearWx: (extraCrossDimension) {
+      assert(
+        assertDoubleRoughlyEqual(extraCrossDimension, 0),
+      );
+      return assertWx();
+    },
   );
 }

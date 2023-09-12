@@ -9,6 +9,7 @@ import 'package:mhu_dart_model/mhu_dart_model.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/context/text.dart';
 import 'package:mhu_shafts/src/layout.dart';
+export 'package:mhu_shafts/src/layout.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
 import 'package:mhu_shafts/src/shaft/options.dart';
 import 'package:mhu_shafts/src/shaft_factory.dart';

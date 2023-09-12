@@ -5,9 +5,11 @@ ShaftContent constantStringTextShaftContent({
 }) {
   return (rectCtx) {
     return rectCtx
-        .defaultTextCtx()
-        .wxTextHorizontal(text: text)
-        .fixedVerticalSharingBox()
+        .createColumnCtx()
+        .textRow(
+          textStyleWrap: rectCtx.defaultTextCtx().textStyleWrap,
+          text: text,
+        )
         .toSingleElementIterable;
   };
 }
