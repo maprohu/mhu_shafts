@@ -132,13 +132,17 @@ Wx wxLinearWidgets({
   Wx render(
     double? extraSpace,
   ) {
-    final intrinsicCrossSizes = widgets.map((sw) {
-      return (
-        sizingWidget: sw,
-        intrinsicCrossSize:
-            sw.createLinearWx(0).sizeAxisDimension(axis: crossAxis),
-      );
-    }).toList();
+    final intrinsicCrossSizes = linearCtx.runWxSizing$(
+      () => widgets.map(
+        (sw) {
+          return (
+            sizingWidget: sw,
+            intrinsicCrossSize:
+                sw.createLinearWx(0).sizeAxisDimension(axis: crossAxis),
+          );
+        },
+      ).toList(),
+    );
     final maxCrossSize =
         intrinsicCrossSizes.map((e) => e.intrinsicCrossSize).maxOrNull ?? 0;
     final children = [

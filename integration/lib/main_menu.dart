@@ -37,10 +37,9 @@ ShaftActions sampleMainMenu(ShaftCtx shaftCtx) {
         ),
       ];
     }),
-    // callShaftFocusHandler: focused.watchValue,
     callShaftInterface: voidShaftInterface,
     callParseShaftIdentifier: keyOnlyShaftIdentifier,
     callLoadShaftEphemeralData: shaftWithoutEphemeralData,
-    callShaftDataPersistence: shaftWithoutDataPersistence,
+    callShaftDataPersistence: shaftWithDefaultPersistence,
   );
 }

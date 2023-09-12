@@ -39,20 +39,6 @@ class FileSystemShaftFactory extends IoShaftFactoryMarker {
 
     return ComposedShaftActions(
       callShaftLabelString: labelString,
-      // callShaftHeaderLabel: stringShaftHeaderLabel(
-      //   () {
-      //     final state = ephemeralData.watchValue();
-      //     final name = absolutePath.filePath.last;
-      //
-      //     switch (state) {
-      //       case FileSystemShaftDirectory():
-      //         return "$name/";
-      //       default:
-      //         return name;
-      //     }
-      //   },
-      // ),
-      // callShaftOpenerLabel: stringShaftOpenerLabel(labelString),
       callShaftContent: () {
         return fileSystemShaftContent(
           ephemeralData: ephemeralData,
@@ -152,8 +138,6 @@ ShaftContent fileSystemShaftContent({
 
       case FileSystemShaftDirectory():
         yield rectCtx.menuRectSharingBox(
-          pageCountCallback: (_) {}, // TODO
-          pageNumber: rectCtx.singleChunkedContentPageNumber(),
           items: state.listing.entries.map((entry) {
             final itemPath = absoluteFilePath.absolutePathChild$(entry.name);
             return ioShaftOpener<FileSystemShaftFactory>(

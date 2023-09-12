@@ -21,6 +21,7 @@ part 'sharing.dart';
 part 'divider.dart';
 part 'padding.dart';
 part 'aim.dart';
+part 'sizer.dart';
 
 typedef WxHeightBuilder = Wx Function(double height);
 

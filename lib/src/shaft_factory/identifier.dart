@@ -52,6 +52,13 @@ final anyInt32Lift = ComposedLift<AnyMsg, int>(
     ..freeze(),
 );
 
+final anyRepeatedInt32Lift = ComposedLift<AnyMsg, List<int>>(
+  higher: (low) => low.repeatedInt32Value.int32Values,
+  lower: (high) => AnyMsg()
+    ..ensureRepeatedInt32Value().int32Values.addAll(high)
+    ..freeze(),
+);
+
 Call<ParseShaftIdentifier<T>> anyMsgLiftCallParseShaftIdentifier<T>({
   @ext required AnyMsgLift<T> anyMsgLift,
 }) {

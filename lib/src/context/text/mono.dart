@@ -149,6 +149,7 @@ double calculateMonoTextStyleIntrinsicHeight({
 SizingWidget monoTextCtxSharingBox({
   @ext required MonoTextCtx monoTextCtx,
   required String string,
+  PagerBits? pagerBits,
 }) {
   final monoTextStyle = monoTextCtx.monoTextStyle;
 
@@ -164,10 +165,9 @@ SizingWidget monoTextCtxSharingBox({
       textStyleWrap: monoTextCtx.renderCtxThemeWrap().defaultTextStyleWrap,
       text: "Empty string.",
     ),
-    pageCountCallback: (_) {}, // TODO
+    pagerBits: pagerBits,
     itemDimension: monoTextStyle.sizeHeight(),
     itemCount: lines.length,
-    pageNumber: 0,
     itemBuilder: (index, rectCtx) {
       final text = lines[index];
 

@@ -9,6 +9,7 @@ import 'package:mhu_shafts/src/context/shaft.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:protobuf/protobuf.dart';
 
+import '../shaft.dart';
 import '../shaft_factory.dart';
 import 'persist.dart' as $lib;
 

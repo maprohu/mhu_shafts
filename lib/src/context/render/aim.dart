@@ -71,12 +71,15 @@ class AimRegistryData {
 
 AimsBuilder createAimsBuilder({
   required final HandlePressedKey? focusedHandler,
+  required WxSizer wxSizer,
 }) {
   if (focusedHandler == null) {
     final aimRegistryData = AimRegistryData();
 
     return ComposedAimsBuilder(
-      aimRegistry: aimRegistryData.createUnfocusedAimRegistry(),
+      aimRegistry: aimRegistryData.createUnfocusedAimRegistry(
+        wxSizer: wxSizer,
+      ),
       buildAims: (aimKeysCollectionProvider) {
         final aims = aimRegistryData.aims;
         final aimCount = aims.length;
@@ -223,6 +226,7 @@ abstract class AimsBuilder implements HasAimRegistry, HasBuildAims {}
 
 AimRegistry createUnfocusedAimRegistry({
   @ext required AimRegistryData aimRegistryData,
+  required WxSizer wxSizer,
 }) {
   return ComposedAimRegistry(
     registerAim: (aimAction) {
@@ -230,7 +234,9 @@ AimRegistry createUnfocusedAimRegistry({
         aimAction: aimAction,
       );
 
-      aimRegistryData.aims.add(registeredAimData);
+      if (!wxSizer.checkWxSizing()) {
+        aimRegistryData.aims.add(registeredAimData);
+      }
 
       return ComposedRegisteredAim(
         readAimKeys: () => registeredAimData.aimKeys,

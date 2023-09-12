@@ -11,9 +11,8 @@ SizingWidget menuRectSharingBox({
   @ext required RectCtx rectCtx,
   required List<MenuItem> items,
   double? itemHeight,
-  required PageNumber pageNumber,
   String emptyMessage = "No menu items.",
-  PageCountCallback pageCountCallback = ignore1,
+  PagerBits? pagerBits,
 }) {
   final themeWrap = rectCtx.renderCtxThemeWrap();
   itemHeight ??= themeWrap.menuItemPaddingSizer.callOuterHeight();
@@ -21,8 +20,7 @@ SizingWidget menuRectSharingBox({
   return columnCtx.chunkedSizingWidget(
     itemDimension: itemHeight,
     itemCount: items.length,
-    pageNumber: pageNumber,
-    pageCountCallback: pageCountCallback,
+    pagerBits: pagerBits,
     emptySizingWidget: columnCtx.textRow(
       textStyleWrap: themeWrap.defaultTextStyleWrap,
       text: emptyMessage,

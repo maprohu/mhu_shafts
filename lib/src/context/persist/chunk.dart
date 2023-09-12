@@ -1,10 +1,36 @@
 part of '../persist.dart';
 
 typedef ChunkedContentKey = int;
+@Has()
 typedef PageNumber = int;
+@Has()
 typedef PageNumberVar = WatchWrite<PageNumber>;
 
-const mshDataPackageId = 0;
+typedef DataPackageId = int;
+
+const DataPackageId mshDataPackageId = 0;
+
+@Has()
+typedef PagerKey = ({
+  DataPackageId packageId,
+  ChunkedContentKey contentKey,
+});
+
+final anyPagerKeyLift = anyRepeatedInt32Lift.liftComposition<PagerKey>(
+  higher: ComposedLift(
+    higher: (low) {
+      final [packageId, contentKey] = low;
+      return (
+        packageId: packageId,
+        contentKey: contentKey,
+      );
+    },
+    lower: (high) => [
+      high.packageId,
+      high.contentKey,
+    ],
+  ),
+);
 
 final mshChunkedSingletons = Singletons.mixin<int, ChunkedContentMarker>({
   0: SingleChunkedContent(),
@@ -20,8 +46,7 @@ ChunkedContentKey mshChunkedContentKeyOf<T extends ChunkedContentMarker>() {
   return mshChunkedSingletons.lookupSingletonByType<T>().singletonKey;
 }
 
-WatchWrite<PageNumber>
-    chunkedContentPageNumberVarOf<T extends ChunkedContentMarker>({
+PagerBits mshChunkedContentPagePagerBitsOf<T extends ChunkedContentMarker>({
   @ext required ShaftCtx shaftCtx,
 }) {
   assert(T != ChunkedContentMarker);
@@ -32,7 +57,7 @@ WatchWrite<PageNumber>
 
   final dataUpdate = dataVar.watchWriteMsgDeepUpdate();
 
-  return ComposedWatchWrite.watchRead(
+  final PageNumberVar pageNumberVar = ComposedWatchWrite.watchRead(
     watchRead: dataVar.mapWatchReadFn$(
       (data) => data.packages[mshDataPackageId]?.chunkPages[key] ?? 0,
     ),
@@ -49,16 +74,31 @@ WatchWrite<PageNumber>
       );
     },
   );
+
+  final PagerKey pagerKey = (
+    packageId: mshDataPackageId,
+    contentKey: key,
+  );
+
+  final pageCountMap = shaftCtx.shaftObj.pageCountMap;
+  return ComposedPagerBits(
+    pageCountVar: ComposedReadWriteValue(
+      readValue: () {
+        // assert(pageCountMap.containsKey(pagerKey), pagerKey);
+        return pageCountMap[pagerKey];
+      },
+      writeValue: (value) {
+        assert(!pageCountMap.containsKey(pagerKey), pagerKey);
+        pageCountMap[pagerKey] = value;
+      },
+    ),
+    pageNumberVar: pageNumberVar,
+    pagerKey: pagerKey,
+  );
 }
 
-WatchWrite<PageNumber> singleChunkedContentPageNumberVar({
+PagerBits singleChunkedContentPagerBits({
   @ext required ShaftCtx shaftCtx,
 }) {
-  return shaftCtx.chunkedContentPageNumberVarOf<SingleChunkedContent>();
-}
-
-PageNumber singleChunkedContentPageNumber({
-  @ext required ShaftCtx shaftCtx,
-}) {
-  return shaftCtx.singleChunkedContentPageNumberVar().watchValue();
+  return shaftCtx.mshChunkedContentPagePagerBitsOf<SingleChunkedContent>();
 }

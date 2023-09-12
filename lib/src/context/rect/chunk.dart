@@ -2,6 +2,10 @@ part of '../rect.dart';
 
 typedef PageSize = int;
 typedef PageCount = int;
+
+@Has()
+typedef PageCountVar = ReadWriteValue<PageCount?>;
+@Has()
 typedef PageCountCallback = void Function(PageCount? pageCount);
 typedef PageCountHolder = LateFinal<PageCount>;
 
@@ -15,34 +19,34 @@ SizingWidget chunkedListSizingWidget({
   required List<WxRectBuilder> items,
   required Dimension itemDimension,
   required SizingWidget emptySizingWidget,
-  PageCountCallback pageCountCallback = ignore1,
+  PagerBits? pagerBits,
 }) {
   final themeWrap = columnCtx.renderCtxThemeWrap();
   return columnCtx.chunkedSizingWidget(
     itemDimension: itemDimension,
     itemCount: items.length,
-    pageNumber: 0,
+    pagerBits: pagerBits,
     itemBuilder: (index, rectCtx) {
       return items[index].call(rectCtx);
     },
     dividerThickness: themeWrap.menuItemsDividerThickness,
     emptySizingWidget: emptySizingWidget,
-    pageCountCallback: pageCountCallback,
   );
 }
 
 SizingWidget chunkedSizingWidget({
   @ext required ColumnCtx columnCtx,
+  PagerBits? pagerBits,
   required Dimension itemDimension,
   required int itemCount,
-  required int pageNumber,
   required Wx Function(int index, RectCtx rectCtx) itemBuilder,
   required double? dividerThickness,
   required SizingWidget emptySizingWidget,
-  required PageCountCallback pageCountCallback,
 }) {
+  final effectivePagerBits =
+      pagerBits ?? columnCtx.singleChunkedContentPagerBits();
   if (itemCount == 0) {
-    pageCountCallback(0);
+    effectivePagerBits.pageCountVar.writeValue(0);
     return emptySizingWidget;
   }
 
@@ -52,10 +56,16 @@ SizingWidget chunkedSizingWidget({
       itemCount * itemDimension + (itemCount - 1) * (dividerThickness ?? 0);
 
   final pageDimensionHolder = SingleAssign<PageDimension?>.withDefault(
-    callback: (value) => pageCountCallback(value?.count),
+    callback: (value) =>
+        effectivePagerBits.pageCountVar.writeValue(value?.count),
     defaultValue: null,
   );
   Wx createFooter() {
+    final pagerOpener = mshShaftOpenerOf<PagerShaftFactory>(
+      identifierAnyData: anyPagerKeyLift.lower(
+        effectivePagerBits.pagerKey,
+      ),
+    );
     return columnCtx.wxLinearWidgets(
       widgets: [
         columnCtx.linearDivider(
@@ -64,14 +74,31 @@ SizingWidget chunkedSizingWidget({
         columnCtx.linearPadding(
           edgeInsets: themeWrap.chunkedFooterPaddingSizer.edgeInsets,
           builder: (deflatedCtx) {
-            return deflatedCtx.asColumnCtx().textRow(
-                  textStyleWrap: themeWrap.chunkedFooterTextStyleWrap,
-                  text: "$pageNumber/${pageDimensionHolder.value}",
-                );
+            final row = deflatedCtx.createRowCtx();
+            return row.wxLinearWidgets(widgets: [
+              row
+                  .wxAim(
+                    watchAction: pagerOpener
+                        .openShaftAction(shaftCtx: row)
+                        .constantCall(),
+                  )
+                  .solidWidgetWx(
+                    linearCtx: row,
+                  ),
+              row.defaultTextShrinkingWidget(
+                text: [
+                  "${effectivePagerBits.pageNumberVar.readValue()}",
+                  "${pageDimensionHolder.value?.count}",
+                ].join("/"),
+              ),
+            ]).solidWidgetWx(linearCtx: deflatedCtx);
           },
         )
       ],
       fill: false,
+    ).wxDecorateShaftOpener(
+      shaftOpener: pagerOpener,
+      shaftCtx: columnCtx,
     );
   }
 
@@ -91,7 +118,9 @@ SizingWidget chunkedSizingWidget({
         size: fitCount,
       );
     }
-    final footerHeight = createFooter().sizeHeight();
+    final footerHeight = columnCtx.runWxSizing$(
+      () => createFooter().sizeHeight(),
+    );
     final pagesFitCount = itemFitCount(
       available: assignedHeight - footerHeight,
       itemSize: itemDimension,
@@ -167,7 +196,7 @@ SizingWidget chunkedSizingWidget({
       }
       final effectivePageNumber = min(
         pageDimension.count - 1,
-        pageNumber,
+        effectivePagerBits.pageNumberVar.readValue(),
       );
       return assignedCtx.wxLinearWidgets(
         widgets: [

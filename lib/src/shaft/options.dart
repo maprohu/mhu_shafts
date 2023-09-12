@@ -20,7 +20,6 @@ class OptionsShaftFactory extends ShaftFactory {
                   label: "Close Shaft",
                 ),
             ],
-            pageNumber: shaftCtx.singleChunkedContentPageNumber(),
           );
         };
       },

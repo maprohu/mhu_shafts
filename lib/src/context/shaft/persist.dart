@@ -5,7 +5,7 @@ WatchWrite<D> shaftPersistedData<D>({
 }) {
   return shaftCtx.windowObj.shaftPersistedStore[shaftCtx.shaftCtxShaftSeq()]
           ?.data as WatchWrite<D>? ??
-      (throw ('shaft data not found', shaftCtx.shaftObj.shaftActions));
+      (throw ('shaft data not found', shaftCtx.shaftObj.shaftFactory));
 }
 
 WatchWrite<MshShaftDataMsg> shaftDefaultPersistedData({

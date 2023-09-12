@@ -4,6 +4,7 @@ import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_flutter_commons/mhu_flutter_commons.dart';
 
+import '../shaft.dart';
 import '../wx/wx.dart';
 import 'text.dart' as $lib;
 

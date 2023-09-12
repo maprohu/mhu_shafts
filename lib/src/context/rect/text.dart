@@ -20,6 +20,17 @@ SharingBox rectMonoTextSharingBox({
   );
 }
 
+ShrinkingWidget defaultTextShrinkingWidget({
+  @ext required RowCtx rowCtx,
+  required String text,
+  Alignment alignment = Alignment.centerLeft,
+}) {
+  return rowCtx.textShrinkingWidget(
+    textStyleWrap: rowCtx.defaultTextCtx().textStyleWrap,
+    text: text,
+  );
+}
+
 ShrinkingWidget textShrinkingWidget({
   @ext required RowCtx rowCtx,
   @ext required TextStyleWrap textStyleWrap,

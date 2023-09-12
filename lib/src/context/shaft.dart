@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:async/async.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mhu_dart_annotation/mhu_dart_annotation.dart';
@@ -8,7 +7,6 @@ import 'package:mhu_dart_commons/commons.dart';
 import 'package:mhu_dart_model/mhu_dart_model.dart';
 import 'package:mhu_shafts/src/context/rect.dart';
 import 'package:mhu_shafts/src/context/text.dart';
-import 'package:mhu_shafts/src/layout.dart';
 export 'package:mhu_shafts/src/layout.dart';
 import 'package:mhu_shafts/src/shaft/custom.dart';
 import 'package:mhu_shafts/src/shaft/options.dart';
@@ -16,16 +14,16 @@ import 'package:mhu_shafts/src/shaft_factory.dart';
 import 'package:protobuf/protobuf.dart';
 export 'package:mhu_shafts/src/context/render.dart';
 
-import '../../io.dart';
 import '../../proto.dart';
 import '../model.dart';
 import '../shaft.dart';
 import '../wx/wx.dart';
+
 import 'shaft.dart' as $lib;
 
-part 'shaft.g.dart';
-
 part 'shaft.g.has.dart';
+
+part 'shaft.g.dart';
 
 part 'shaft/render.dart';
 
@@ -34,6 +32,7 @@ part 'shaft/header.dart';
 part 'shaft/open.dart';
 
 part 'shaft/text.dart';
+
 part 'shaft/persist.dart';
 
 @Has()
@@ -77,17 +76,23 @@ class ShaftObj with MixShaftCtx, MixShaftMsg {
   late final shaftIdentifier = shaftMsg.shaftIdentifier;
   late final shaftFactoryKeyPath = shaftIdentifier.shaftFactoryKeyPath;
 
-  late final shaftActions = mshLookupKeyShaftFactory(
+  late final shaftFactory = mshLookupKeyShaftFactory(
     shaftFactoryKey: shaftFactoryKeyPath.first,
-  ).buildShaftActions(shaftCtx);
+  );
+  late final shaftActions = shaftFactory.buildShaftActions(shaftCtx);
 
   late final shaftIdentifierObj =
       shaftIdentifier.parseShaftIdentifier(shaftObj: this);
 
-  late final ephemeralData =
-      shaftCtx.windowObj.shaftEphemeralStore.getOrThrow(
-    this.shaftCtxShaftSeq(),
-  ).data;
+  late final ephemeralData = shaftCtx.windowObj.shaftEphemeralStore
+      .getOrThrow(
+        this.shaftCtxShaftSeq(),
+      )
+      .data;
+
+  final pageCountMap = <PagerKey, PageCount?>{};
+
+  late final shaftLayout = shaftCtx.renderShaftLayout();
 }
 
 @Compose()
@@ -112,7 +117,7 @@ Iterable<ShaftCtx> shaftCtxLeftIterable({
   @extHas required ShaftCtx shaftCtx,
 }) {
   return shaftCtx.finiteIterable(
-        (item) => item.shaftObj.shaftOnLeft?.shaftCtx,
+    (item) => item.shaftObj.shaftOnLeft?.shaftCtx,
   );
 }
 
@@ -178,4 +183,33 @@ ShaftSeq shaftCtxShaftSeq({
   @extHas required ShaftObj shaftObj,
 }) {
   return shaftObj.shaftMsg.shaftSeq;
+}
+
+ShaftLayout renderShaftLayout({
+  @ext required ShaftCtx shaftCtx,
+}) {
+  final shaftObj = shaftCtx.shaftObj;
+  final renderObj = shaftCtx.renderObj;
+
+  final shaftWidthPixels = renderObj.visibleShaftWidthPixels(
+    units: shaftObj.visibleWidthUnits,
+  );
+
+  final rectCtx = shaftCtx.createRectCtx(
+    size: Size(
+      shaftWidthPixels,
+      renderObj.screenHeight,
+    ),
+  );
+
+  return rectCtx.renderShaft();
+}
+
+PageCount? shaftPageCount({
+  @extHas required ShaftObj shaftObj,
+  required PagerKey pagerKey,
+}) {
+  shaftObj.shaftLayout.runtimeType; // ensure layout
+
+  return shaftObj.pageCountMap[pagerKey];
 }

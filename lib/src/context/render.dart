@@ -74,6 +74,7 @@ class RenderObj with MixRenderCtx {
 
   late final aimsBuilder = createAimsBuilder(
     focusedHandler: focusedHandler,
+    wxSizer: wxSizer,
   );
 
   late final aimsRegistry = aimsBuilder.aimRegistry;
@@ -83,11 +84,13 @@ class RenderObj with MixRenderCtx {
       controlWrap: controlWrap,
     ),
   );
+
+  late final wxSizer = createWxSizer();
 }
 
 @Compose()
 @Has()
-abstract class RenderCtx implements WindowCtx, HasRenderObj {}
+abstract class RenderCtx implements WindowCtx, HasRenderObj, HasWxSizer {}
 
 RenderCtx createRenderCtx({
   @Ext() required WindowCtx windowCtx,
@@ -97,6 +100,7 @@ RenderCtx createRenderCtx({
   return ComposedRenderCtx.windowCtx(
     windowCtx: windowCtx,
     renderObj: renderObj,
+    wxSizer: renderObj.wxSizer,
   )..initMixRenderCtx(renderObj);
 }
 
@@ -112,21 +116,9 @@ RenderedView watchRenderRenderedView({
 
   final shafts = visibleShafts
       .reversedIListIterable()
-      .map((shaftCtx) {
-        final shaftObj = shaftCtx.shaftObj;
-        final shaftWidthPixels = renderObj.visibleShaftWidthPixels(
-          units: shaftObj.visibleWidthUnits,
-        );
-
-        final rectCtx = shaftCtx.createRectCtx(
-          size: Size(
-            shaftWidthPixels,
-            renderObj.screenHeight,
-          ),
-        );
-
-        return rectCtx.renderShaft();
-      })
+      .map(
+        (shaftCtx) => shaftCtx.shaftObj.shaftLayout,
+      )
       .toIList()
       .reversed
       .toIList();
@@ -199,4 +191,11 @@ ThemeWrap renderCtxThemeWrap({
   @extHas required RenderObj renderObj,
 }) {
   return renderObj.themeWrap;
+}
+
+R runWxSizing<R>({
+  @extHas required WxSizer wxSizer,
+  required Call<R> action,
+}) {
+  return wxSizer.runSizing(action);
 }
