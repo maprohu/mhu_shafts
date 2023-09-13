@@ -73,7 +73,7 @@ SizingWidget chunkedSizingWidget({
         ),
         columnCtx.linearPadding(
           edgeInsets: themeWrap.chunkedFooterPaddingSizer.edgeInsets,
-          builder: (deflatedCtx) {
+          builder: columnCtx.rigidPaddingBuilder$((deflatedCtx) {
             final row = deflatedCtx.createRowCtx();
             return row.wxLinearWidgets(widgets: [
               row
@@ -82,7 +82,7 @@ SizingWidget chunkedSizingWidget({
                         .openShaftAction(shaftCtx: row)
                         .constantCall(),
                   )
-                  .solidWidgetWx(
+                  .rigidWidgetWx(
                     linearCtx: row,
                   ),
               row.defaultTextShrinkingWidget(
@@ -91,8 +91,8 @@ SizingWidget chunkedSizingWidget({
                   "${pageDimensionHolder.value?.count}",
                 ].join("/"),
               ),
-            ]).solidWidgetWx(linearCtx: deflatedCtx);
-          },
+            ]);
+          }),
         )
       ],
       fill: false,
@@ -139,14 +139,14 @@ SizingWidget chunkedSizingWidget({
     );
   }
 
-  final holder = dimensionHolder(
+  final holder = createDimensionHolder(
     onAssignDimension: (assignedHeight) {
       pageDimensionHolder.value = pageDimension(assignedHeight);
     },
   );
 
-  return ComposedShrinkingWidget.dimensionHolder(
-    dimensionHolder: holder,
+  return ComposedShrinkingWidget.assignDimensionBits(
+    assignDimensionBits: holder,
     intrinsicDimension: intrinsicHeight,
     createLinearWx: (extraCrossDimension) {
       assert(assertDoubleRoughlyEqual(extraCrossDimension, 0));
@@ -170,7 +170,7 @@ SizingWidget chunkedSizingWidget({
             assignedCtx.linearWithMainDimension(dimension: itemDimension);
 
         final result = integers(from: from).take(count).map(
-              (index) => itemBuilder(index, itemCtx).solidWidgetWx(
+              (index) => itemBuilder(index, itemCtx).rigidWidgetWx(
                 linearCtx: assignedCtx,
               ),
             );
@@ -204,7 +204,7 @@ SizingWidget chunkedSizingWidget({
             from: effectivePageNumber * pageDimension.size,
             count: pageDimension.size,
           ),
-          createFooter().solidWidgetWx(
+          createFooter().rigidWidgetWx(
             linearCtx: assignedCtx,
           ),
         ],

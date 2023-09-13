@@ -54,7 +54,7 @@ typedef ShaftOpenerLabel = WxRectBuilder;
 typedef ShaftFocusHandler = HandlePressedKey?;
 
 @Has()
-typedef ShaftContent = BuildSharingBoxes;
+typedef ShaftContent = BuildSizingWidgets;
 
 @Has()
 typedef ShaftInterface = dynamic;

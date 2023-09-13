@@ -126,6 +126,12 @@ class ThemeWrap with MixAppCtx, MixThemeMsg {
 
   late final protoFieldPaddingSizer =
       this.themePaddingSizer(innerHeight: protoFieldItemInnerHeight);
+
+
+  late final pagerSelectedBackgroundColor = Colors.green;
+  late final pagerItemPadding = defaultPadding;
+  late final pagerItemTextStyleWrap = defaultTextStyleWrap;
+  late final pagerDividerThickness = 1.0;
 }
 
 ThemeWrap createThemeWrap({

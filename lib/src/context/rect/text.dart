@@ -41,10 +41,10 @@ ShrinkingWidget textShrinkingWidget({
 
   final size = textSpan.textSpanSize();
 
-  final holder = dimensionHolder();
+  final holder = createDimensionHolder();
 
-  return ComposedShrinkingWidget.dimensionHolder(
-    dimensionHolder: holder,
+  return ComposedShrinkingWidget.assignDimensionBits(
+    assignDimensionBits: holder,
     intrinsicDimension: size.width,
     createLinearWx: (extraCrossDimension) {
       return rowCtx
@@ -97,7 +97,7 @@ RectCtx linearWxRect({
   );
 }
 
-SolidWidget defaultTextRow({
+RigidWidget defaultTextRow({
   @ext required ColumnCtx columnCtx,
   AxisAlignment horizontal = AxisAlignment.left,
   required String text,
@@ -108,7 +108,7 @@ SolidWidget defaultTextRow({
   );
 }
 
-SolidWidget textRow({
+RigidWidget textRow({
   @ext required ColumnCtx columnCtx,
   AxisAlignment horizontal = AxisAlignment.left,
   @ext required TextStyleWrap textStyleWrap,
@@ -116,7 +116,7 @@ SolidWidget textRow({
 }) {
   final textCtx = columnCtx.createTextCtx(textStyleWrap: textStyleWrap);
 
-  return columnCtx.solidWidgetStretchedWx(
+  return columnCtx.linearRigidStretched(
     createWx: () {
       return wxTextHorizontal(
         textCtx: textCtx,

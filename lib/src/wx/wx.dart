@@ -9,21 +9,32 @@ import '../layout.dart';
 import 'wx.dart' as $lib;
 
 part 'wx.freezed.dart';
+
 part 'wx.g.has.dart';
 
 part 'wx.g.dart';
 
 part 'linear.dart';
+
 part 'align.dart';
+
 part 'fill.dart';
+
 part 'decorate.dart';
+
 part 'sharing.dart';
+
 part 'divider.dart';
+
 part 'padding.dart';
+
 part 'aim.dart';
+
 part 'sizer.dart';
 
+
 typedef WxHeightBuilder = Wx Function(double height);
+
 
 @freezedStruct
 class Wx with _$Wx implements HasSize {
@@ -60,7 +71,7 @@ Widget wxWidgetSizedBox({
 }) {
   return SizedBox.fromSize(
     size: wx.size,
-    child: wx. widget,
+    child: wx.widget,
   );
 }
 
@@ -80,5 +91,21 @@ Wx wxEmpty({
       size: size,
     ),
     size: size,
+  );
+}
+
+Wx wxDecorateWidget({
+  @ext required Wx wx,
+  required WidgetDecorator? decorator,
+}) {
+  if (decorator == null) {
+    return wx;
+  }
+
+  return Wx(
+    widget: decorator(
+      wx.widget,
+    ),
+    size: wx.size,
   );
 }

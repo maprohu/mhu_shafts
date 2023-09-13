@@ -17,7 +17,8 @@ part 'layout.g.dart';
 
 part 'layout.freezed.dart';
 
-part 'layout/widget_line.dart';
+part 'layout/linear.dart';
+part 'layout/linear/rigid.dart';
 
 part 'layout/text.dart';
 

@@ -36,6 +36,10 @@ part 'rect/sharing_box.dart';
 part 'rect/menu.dart';
 
 part 'rect/linear.dart';
+part 'rect/linear/padding.dart';
+part 'rect/linear/rigid.dart';
+part 'rect/linear/column.dart';
+part 'rect/linear/divider.dart';
 
 part 'rect/text.dart';
 

@@ -193,31 +193,21 @@ Wx wxLinearWidgets({
   }
 }
 
-SolidWidget linearSolid({
-  @ext required LinearCtx linearCtx,
-  required CreateLinearWx builder,
-}) {
-  final intrinsicDimension =
-      builder(0).size.sizeAxisDimension(axis: linearCtx.axis);
-  return ComposedSolidWidget(
-    intrinsicDimension: intrinsicDimension,
-    createLinearWx: builder,
-  );
-}
-
 GrowingWidget linearGrow({
   @ext required LinearCtx linearCtx,
   required WxGrowBuilder builder,
 }) {
-  final intrinsicDimension = builder((
-    main: 0,
-    cross: 0,
-  )).size.sizeAxisDimension(
-        axis: linearCtx.axis,
-      );
-  final holder = dimensionHolder();
-  return ComposedGrowingWidget.dimensionHolder(
-    dimensionHolder: holder,
+  final intrinsicDimension = linearCtx.runWxSizing$(
+    () => builder((
+      main: 0,
+      cross: 0,
+    )).size.sizeAxisDimension(
+          axis: linearCtx.axis,
+        ),
+  );
+  final holder = createDimensionHolder();
+  return ComposedGrowingWidget.assignDimensionBits(
+    assignDimensionBits: holder,
     intrinsicDimension: intrinsicDimension,
     createLinearWx: (extraCrossDimension) {
       return builder((
@@ -247,91 +237,38 @@ GrowingWidget linearGrowEmpty({
   );
 }
 
-SizingWidget linearPadding({
+CreateLinearWx createLinearWxStretched({
   @ext required LinearCtx linearCtx,
-  required EdgeInsets edgeInsets,
-  required SizingWidget Function(LinearCtx deflatedCtx) builder,
+  required Call<Wx> createWx,
 }) {
-  final innerCtx = linearCtx
-      .rectWithSize(
-        size: edgeInsets.deflateSize(linearCtx.size),
-      )
-      .createLinearCtx(
-        axis: linearCtx.axis,
-      );
-
-  final innerWidget = builder(innerCtx);
-
-  final paddingMainAxisDimension = edgeInsets.edgeInsetsAxisDimension(
-    axis: linearCtx.axis,
-  );
-
-  final intrinsicDimension =
-      innerWidget.intrinsicDimension + paddingMainAxisDimension;
-
-  DimensionHolder holder(DimensionHolder holder) {
-    return ComposedDimensionHolder(
-      assignDimension: (value) =>
-          holder.assignDimension(value + paddingMainAxisDimension),
-      assignedDimension: () =>
-          holder.assignedDimension() - paddingMainAxisDimension,
+  Wx assertWx() {
+    final wx = createWx();
+    assert(
+      linearCtx.assertOrientedCrossRoughlyEqual(size: wx.size),
     );
+    return wx;
   }
 
-  Wx createWx(Dimension crossExtra) =>
-      innerWidget.createLinearWx(crossExtra).wxPadding(
-            edgeInsets: edgeInsets,
-          );
-
-  switch (innerWidget) {
-    case SolidWidget():
-      return ComposedSolidWidget(
-        intrinsicDimension: intrinsicDimension,
-        createLinearWx: createWx,
-      );
-    case GrowingWidget():
-      return ComposedGrowingWidget.dimensionHolder(
-        dimensionHolder: holder(innerWidget),
-        intrinsicDimension: intrinsicDimension,
-        createLinearWx: createWx,
-      );
-    case ShrinkingWidget():
-      return ComposedShrinkingWidget.dimensionHolder(
-        dimensionHolder: holder(innerWidget),
-        intrinsicDimension: intrinsicDimension,
-        createLinearWx: createWx,
-      );
-  }
+  return (extraCrossDimension) {
+    assert(
+      assertDoubleRoughlyEqual(extraCrossDimension, 0),
+    );
+    return assertWx();
+  };
 }
 
-SolidWidget linearDivider({
+CreateLinearWx assignedRectWxStretched({
   @ext required LinearCtx linearCtx,
-  required Dimension thickness,
+  required HasAssignedDimension holder,
+  required WxRectBuilder builder,
 }) {
-  return linearCtx.linearSolid(
-    builder: (extraCrossDimension) {
-      return wxRectDivider(
-        rectCtx: linearCtx.rectWithSize(
-          size: linearCtx
-              .orientedBoxWithCrossDimension(
-                dimension: extraCrossDimension,
-              )
-              .size,
+  return linearCtx.createLinearWxStretched(
+    createWx: () {
+      return builder(
+        linearCtx.linearWithMainDimension(
+          dimension: holder.assignedDimension(),
         ),
-        layoutAxis: linearCtx.axis,
-        thickness: thickness,
       );
     },
-  );
-}
-
-Wx wxLinearDividerStretch({
-  @ext required LinearCtx linearCtx,
-  required Dimension thickness,
-}) {
-  return wxRectDivider(
-    rectCtx: linearCtx,
-    layoutAxis: linearCtx.axis,
-    thickness: thickness,
   );
 }

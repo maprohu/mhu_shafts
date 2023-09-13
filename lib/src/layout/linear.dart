@@ -23,30 +23,45 @@ typedef AssignedDimension = ReadValue<Dimension>;
 @Has()
 typedef SizingWidgets = Iterable<SizingWidget>;
 
+typedef BuildSizingWidgets = SizingWidgets Function(ColumnCtx columnCtx);
 // @Has()
 // typedef CreateWx = CreateValue<Wx>;
+
+typedef LinearDimensions = ({
+  Dimension main,
+  Dimension crossExtra,
+});
 
 @Has()
 typedef CreateLinearWx = Wx Function(Dimension extraCrossDimension);
 
 @Compose()
-abstract class DimensionHolder
-    implements HasAssignDimension, HasAssignedDimension {}
-
-sealed class SizingWidget implements HasIntrinsicDimension, HasCreateLinearWx {}
+abstract class AssignDimensionBits
+    implements HasAssignDimension // , HasAssignedDimension
+{}
 
 @Compose()
-abstract class SolidWidget implements SizingWidget {}
+abstract class DimensionHolder
+    implements AssignDimensionBits, HasAssignedDimension {}
+
+@Compose()
+abstract class SizingWidgetBits
+    implements HasIntrinsicDimension, HasCreateLinearWx {}
+
+sealed class SizingWidget implements SizingWidgetBits {}
+
+@Compose()
+abstract class RigidWidget implements SizingWidget, SizingWidgetBits {}
 
 sealed class SoftWidget implements SizingWidget, HasAssignDimension {}
 
 @Compose()
-abstract class GrowingWidget implements DimensionHolder, SoftWidget {}
+abstract class GrowingWidget implements AssignDimensionBits, SizingWidgetBits, SoftWidget {}
 
 typedef WxGrowBuilder = Wx Function(GrowDimensions grow);
 
 @Compose()
-abstract class ShrinkingWidget implements DimensionHolder, SoftWidget {}
+abstract class ShrinkingWidget implements AssignDimensionBits, SizingWidgetBits, SoftWidget {}
 
 @freezed
 sealed class LayoutResult with _$LayoutResult {
@@ -63,14 +78,14 @@ LayoutResult performWidgetLayout({
   required SizingWidgets sizingWidgets,
   required Dimension availableSpace,
 }) {
-  final solidWidgets = <SolidWidget>[];
+  final rigidWidgets = <RigidWidget>[];
   final growingWidgets = <GrowingWidget>[];
   var shrinkingWidgets = <ShrinkingWidget>[];
 
   for (final widget in sizingWidgets) {
     switch (widget) {
-      case SolidWidget():
-        solidWidgets.add(widget);
+      case RigidWidget():
+        rigidWidgets.add(widget);
       case GrowingWidget():
         growingWidgets.add(widget);
       case ShrinkingWidget():
@@ -78,10 +93,10 @@ LayoutResult performWidgetLayout({
     }
   }
 
-  final solidTotal = solidWidgets.sumByDouble((e) => e.intrinsicDimension);
+  final rigidTotal = rigidWidgets.sumByDouble((e) => e.intrinsicDimension);
   final growingTotal = growingWidgets.sumByDouble((e) => e.intrinsicDimension);
 
-  final minDimension = solidTotal + growingTotal;
+  final minDimension = rigidTotal + growingTotal;
 
   var softSpace = availableSpace - minDimension;
 
@@ -144,7 +159,7 @@ LayoutResult performWidgetLayout({
   }
 }
 
-DimensionHolder dimensionHolder({
+DimensionHolder createDimensionHolder({
   AssignDimension? onAssignDimension,
 }) {
   late final Dimension dimension;
@@ -157,7 +172,7 @@ DimensionHolder dimensionHolder({
   );
 }
 
-SolidWidget solidWidgetWx({
+RigidWidget rigidWidgetWx({
   @ext required LinearCtx linearCtx,
   @ext required Wx wx,
   AxisAlignment crossAxisAlignment = AxisAlignment.center,
@@ -166,7 +181,7 @@ SolidWidget solidWidgetWx({
   final wxCross = wx.sizeAxisDimension(
     axis: crossAxis,
   );
-  return solidWidgetCreateWx(
+  return linearRigid(
     linearCtx: linearCtx,
     createLinearWx: (extraCrossDimension) {
       final totalCross = wxCross + extraCrossDimension;
@@ -183,40 +198,5 @@ SolidWidget solidWidgetWx({
   );
 }
 
-SolidWidget solidWidgetCreateWx({
-  @ext required LinearCtx linearCtx,
-  required CreateLinearWx createLinearWx,
-}) {
-  final wx = createLinearWx(0);
-  return ComposedSolidWidget(
-    intrinsicDimension: wx.sizeAxisDimension(
-      axis: linearCtx.axis,
-    ),
-    createLinearWx: createLinearWx,
-  );
-}
 
-SolidWidget solidWidgetStretchedWx({
-  @ext required LinearCtx linearCtx,
-  required Call<Wx> createWx,
-}) {
-  Wx assertWx() {
-    final wx = createWx();
-    assert(
-      linearCtx.assertOrientedCrossRoughlyEqual(size: wx.size),
-    );
-    return wx;
-  }
 
-  return ComposedSolidWidget(
-    intrinsicDimension: assertWx().sizeAxisDimension(
-      axis: linearCtx.axis,
-    ),
-    createLinearWx: (extraCrossDimension) {
-      assert(
-        assertDoubleRoughlyEqual(extraCrossDimension, 0),
-      );
-      return assertWx();
-    },
-  );
-}

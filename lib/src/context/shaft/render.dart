@@ -14,7 +14,7 @@ ShaftLayout renderShaft({
 
   final headerWx = shaftLinear.linearPadding(
     edgeInsets: themeWrap.shaftHeaderPaddingSizer.edgeInsets,
-    builder: (paddingCtx) {
+    builder: shaftLinear.rigidPaddingBuilder$((paddingCtx) {
       final headerRow = paddingCtx.createRowCtx();
 
       return headerRow.wxLinearWidgets(widgets: [
@@ -33,11 +33,11 @@ ShaftLayout renderShaft({
               shaftOpener: optionsOpener,
               shaftCtx: headerRow,
             )
-            .solidWidgetWx(
+            .rigidWidgetWx(
               linearCtx: headerRow,
             ),
-      ]).solidWidgetWx(linearCtx: paddingCtx);
-    },
+      ]);
+    }),
   );
 
   final wx = shaftLinear.wxLinearWidgets(widgets: [

@@ -125,18 +125,43 @@ bool isShaftOpen({
   return rightIdentifierObj == openerIdentifierObj;
 }
 
+WidgetDecorator? shaftOpenWidgetDecorator({
+  @ext required ShaftCtx shaftCtx,
+  @ext required ShaftOpener shaftOpener,
+}) {
+  return shaftOpenWidgetDecoratorBool(
+    isOpen: isShaftOpen(
+      shaftOpener: shaftOpener,
+      shaftCtx: shaftCtx,
+    ),
+    themeWrap: shaftCtx.renderCtxThemeWrap(),
+  );
+}
+
+WidgetDecorator? shaftOpenWidgetDecoratorBool({
+  required bool isOpen,
+  @ext required ThemeWrap themeWrap,
+}) {
+  if (isOpen) {
+    return backgroundColorDecorator(
+      backgroundColor: themeWrap.openerIsOpenBackgroundColor,
+    );
+  } else {
+    return null;
+  }
+}
+
 Wx wxDecorateShaftOpenBool({
   @ext required Wx wx,
   required bool isOpen,
   @ext required ThemeWrap themeWrap,
 }) {
-  if (isOpen) {
-    return wx.wxBackgroundColor(
-      color: themeWrap.openerIsOpenBackgroundColor,
-    );
-  } else {
-    return wx;
-  }
+  return wx.wxDecorateWidget(
+    decorator: shaftOpenWidgetDecoratorBool(
+      isOpen: isOpen,
+      themeWrap: themeWrap,
+    ),
+  );
 }
 
 Wx wxDecorateShaftOpener({

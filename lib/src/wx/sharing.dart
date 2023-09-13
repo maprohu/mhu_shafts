@@ -72,36 +72,36 @@ abstract class SharingSize implements HasIndex, HasIntrinsicDimension {}
 @Compose()
 abstract class SharedSize implements HasIndex, HasDimension {}
 
-Map<int, double> distributeSharedSpace({
-  required double space,
-  required List<SharingSize> items,
-}) {
-  final itemCount = items.length;
-
-  final quota = space / itemCount;
-
-  final (positive: overQuota, negative: withinQuota) =
-      items.partition((item) => item.intrinsicDimension > quota);
-
-  if (withinQuota.isEmpty) {
-    return {
-      for (final item in overQuota) item.index: quota,
-    };
-  }
-
-  final withinQuotaTotal =
-      withinQuota.sumByDouble((item) => item.intrinsicDimension);
-
-  final overQuotaSpace = space - withinQuotaTotal;
-
-  return {
-    ...distributeSharedSpace(
-      space: overQuotaSpace,
-      items: overQuota,
-    ),
-    for (final item in withinQuota) item.index: item.intrinsicDimension,
-  };
-}
+// Map<int, double> distributeSharedSpace({
+//   required double space,
+//   required List<SharingSize> items,
+// }) {
+//   final itemCount = items.length;
+//
+//   final quota = space / itemCount;
+//
+//   final (positive: overQuota, negative: withinQuota) =
+//       items.partition((item) => item.intrinsicDimension > quota);
+//
+//   if (withinQuota.isEmpty) {
+//     return {
+//       for (final item in overQuota) item.index: quota,
+//     };
+//   }
+//
+//   final withinQuotaTotal =
+//       withinQuota.sumByDouble((item) => item.intrinsicDimension);
+//
+//   final overQuotaSpace = space - withinQuotaTotal;
+//
+//   return {
+//     ...distributeSharedSpace(
+//       space: overQuotaSpace,
+//       items: overQuota,
+//     ),
+//     for (final item in withinQuota) item.index: item.intrinsicDimension,
+//   };
+// }
 
 // Wx wxLinearShared({
 //   required Size size,
@@ -193,4 +193,3 @@ Map<int, double> distributeSharedSpace({
 typedef SharingBoxes = Iterable<SharingBox>;
 
 // typedef BuildSharingBoxes = SharingBoxes Function(RectCtx rectCtx);
-typedef BuildSharingBoxes = SizingWidgets Function(ColumnCtx columnCtx);
