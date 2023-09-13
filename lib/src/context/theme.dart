@@ -131,7 +131,7 @@ class ThemeWrap with MixAppCtx, MixThemeMsg {
   late final pagerSelectedBackgroundColor = Colors.green;
   late final pagerItemPadding = defaultPadding;
   late final pagerItemTextStyleWrap = defaultTextStyleWrap;
-  late final pagerDividerThickness = 1.0;
+  late final double? pagerDividerThickness = 1.0;
 }
 
 ThemeWrap createThemeWrap({

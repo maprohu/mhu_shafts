@@ -14,6 +14,21 @@ typedef PageDimension = ({
   PageCount count,
 });
 
+Iterable<int> chunkIndices({
+  required int itemCount,
+  required PageSize pageSize,
+  required PageNumber pageNumber,
+}) {
+  final from = pageSize * pageNumber;
+  final rest = itemCount - from;
+  assert(rest > 0);
+  return integers(
+    from: from,
+  ).take(
+    min(rest, pageSize),
+  );
+}
+
 SizingWidget chunkedListSizingWidget({
   @ext required ColumnCtx columnCtx,
   required List<WxRectBuilder> items,
@@ -60,6 +75,7 @@ SizingWidget chunkedSizingWidget({
         effectivePagerBits.pageCountVar.writeValue(value?.count),
     defaultValue: null,
   );
+
   Wx createFooter() {
     final pagerOpener = mshShaftOpenerOf<PagerShaftFactory>(
       identifierAnyData: anyPagerKeyLift.lower(
@@ -75,6 +91,13 @@ SizingWidget chunkedSizingWidget({
           edgeInsets: themeWrap.chunkedFooterPaddingSizer.edgeInsets,
           builder: columnCtx.rigidPaddingBuilder$((deflatedCtx) {
             final row = deflatedCtx.createRowCtx();
+
+            final pageCount = pageDimensionHolder.value?.count ?? 1;
+            final effectivePageNumber = min(
+              effectivePagerBits.pageNumberVar.watchValue(),
+              pageCount - 1,
+            );
+
             return row.wxLinearWidgets(widgets: [
               row
                   .wxAim(
@@ -87,9 +110,9 @@ SizingWidget chunkedSizingWidget({
                   ),
               row.defaultTextShrinkingWidget(
                 text: [
-                  "${effectivePagerBits.pageNumberVar.readValue()}",
-                  "${pageDimensionHolder.value?.count}",
-                ].join("/"),
+                  "$effectivePageNumber",
+                  "[$pageCount]",
+                ].join(" "),
               ),
             ]);
           }),
@@ -163,25 +186,20 @@ SizingWidget chunkedSizingWidget({
       // return assignedCtx.defaultTextCtx().wxTextAlign(text: "chunks");
 
       SizingWidgets items({
-        required int from,
-        required int count,
+        required Iterable<int> indices,
       }) sync* {
         final itemCtx =
             assignedCtx.linearWithMainDimension(dimension: itemDimension);
 
-        final result = integers(from: from).take(count).map(
-              (index) => itemBuilder(index, itemCtx).rigidWidgetWx(
-                linearCtx: assignedCtx,
-              ),
-            );
+        final result = indices.map(
+          (index) => itemBuilder(index, itemCtx).rigidWidgetWx(
+            linearCtx: assignedCtx,
+          ),
+        );
 
-        if (dividerThickness == null) {
-          yield* result;
-        } else {
-          yield* result.separatedBy(
-            assignedCtx.linearDivider(thickness: dividerThickness),
-          );
-        }
+        yield* result.iterableSeparatedByNullable(
+          separator: dividerThickness?.let(assignedCtx.linearDivider$),
+        );
 
         yield assignedCtx.linearGrowEmpty();
       }
@@ -189,8 +207,7 @@ SizingWidget chunkedSizingWidget({
       if (pageDimension.count < 2) {
         return assignedCtx.wxLinearWidgets(
           widgets: items(
-            from: 0,
-            count: itemCount,
+            indices: integers().take(itemCount),
           ).toList(),
         );
       }
@@ -201,8 +218,11 @@ SizingWidget chunkedSizingWidget({
       return assignedCtx.wxLinearWidgets(
         widgets: [
           ...items(
-            from: effectivePageNumber * pageDimension.size,
-            count: pageDimension.size,
+            indices: chunkIndices(
+              itemCount: itemCount,
+              pageSize: pageDimension.size,
+              pageNumber: effectivePageNumber,
+            ),
           ),
           createFooter().rigidWidgetWx(
             linearCtx: assignedCtx,

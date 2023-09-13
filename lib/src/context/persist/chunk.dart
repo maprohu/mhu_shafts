@@ -53,31 +53,14 @@ PagerBits mshChunkedContentPagePagerBitsOf<T extends ChunkedContentMarker>({
 
   final key = mshChunkedContentKeyOf<T>();
 
-  final dataVar = shaftCtx.shaftDefaultPersistedData();
-
-  final dataUpdate = dataVar.watchWriteMsgDeepUpdate();
-
-  final PageNumberVar pageNumberVar = ComposedWatchWrite.watchRead(
-    watchRead: dataVar.mapWatchReadFn$(
-      (data) => data.packages[mshDataPackageId]?.chunkPages[key] ?? 0,
-    ),
-    writeValue: (pageNumber) {
-      dataUpdate.updateValue(
-        (data) {
-          data.packages
-              .putIfAbsent(
-                mshDataPackageId,
-                MshShaftPackageDataMsg.create,
-              )
-              .chunkPages[key] = pageNumber;
-        },
-      );
-    },
-  );
-
   final PagerKey pagerKey = (
     packageId: mshDataPackageId,
     contentKey: key,
+  );
+
+  final pageNumberVar = shaftPageNumberVar(
+    shaftCtx: shaftCtx,
+    pagerKey: pagerKey,
   );
 
   final pageCountMap = shaftCtx.shaftObj.pageCountMap;
@@ -101,4 +84,32 @@ PagerBits singleChunkedContentPagerBits({
   @ext required ShaftCtx shaftCtx,
 }) {
   return shaftCtx.mshChunkedContentPagePagerBitsOf<SingleChunkedContent>();
+}
+
+PageNumberVar shaftPageNumberVar({
+  @ext required ShaftCtx shaftCtx,
+  required PagerKey pagerKey,
+}) {
+  final dataVar = shaftCtx.shaftDefaultPersistedData();
+
+  final dataUpdate = dataVar.watchWriteMsgDeepUpdate();
+  return ComposedWatchWrite.watchRead(
+    watchRead: dataVar.mapWatchReadFn$(
+      (data) =>
+          data.packages[pagerKey.packageId]?.chunkPages[pagerKey.contentKey] ??
+          0,
+    ),
+    writeValue: (pageNumber) {
+      dataUpdate.updateValue(
+        (data) {
+          data.packages
+              .putIfAbsent(
+                pagerKey.packageId,
+                MshShaftPackageDataMsg.create,
+              )
+              .chunkPages[pagerKey.contentKey] = pageNumber;
+        },
+      );
+    },
+  );
 }
